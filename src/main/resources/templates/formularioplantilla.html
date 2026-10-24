@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Formulario de plantilla | SmartNotes</title>
+
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+              th:href="@{/webjars/bootstrap/5.3.8/css/bootstrap.min.css}">
+
+        <style>
+            body {
+                background: #f7f8fd;
+                color: #122438;
+            }
+
+            .panel {
+                background: white;
+                border: 1px solid #e6e9f0;
+                border-radius: 12px;
+                padding: 28px;
+            }
+
+            .tabla-variables {
+                min-width: 650px;
+            }
+
+            .tabla-variables .nombre-variable {
+                min-width: 170px;
+            }
+
+            .tabla-variables .descripcion-variable {
+                min-width: 240px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main class="container py-5">
+            <p class="fw-bold text-primary">
+                SmartNotes · Notas de Planta
+            </p>
+
+            <h1 class="fw-bold"
+                th:text="${plantilla.id == null}
+                ? 'Nueva plantilla'
+                : 'Editar plantilla'">
+                Nueva plantilla
+            </h1>
+
+            <p class="text-secondary">
+                Los campos con * son obligatorios.
+                Define las variables que utilizará el generador de notas.
+            </p>
+
+            <div class="alert alert-info">
+                El guardado es temporal: los datos se perderán
+                al reiniciar la aplicación.
+            </div>
+
+            <form class="panel"
+                  id="formularioPlantilla"
+                  th:object="${plantilla}"
+                  th:action="@{/plantillas/guardar}"
+                  method="post"
+                  novalidate>
+
+                <!-- Errores de validación enviados por Java -->
+                <div class="alert alert-danger"
+                     role="alert"
+                     th:if="${#fields.hasAnyErrors()}">
+                    <p class="fw-bold mb-2">Revisa los siguientes datos:</p>
+
+                    <ul class="mb-0">
+                        <li th:each="error : ${#fields.allErrors()}"
+                            th:text="${error}">
+                            Error de validación
+                        </li>
+                    </ul>
+                </div>
+
+                <input type="hidden" th:field="*{id}">
+
+                <div class="row g-4">
+
+                    <div class="col-md-6">
+                        <label for="nombre" class="form-label">Nombre *</label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="nombre"
+                               name="nombre"
+                               th:field="*{nombre}"
+                               maxlength="150"
+                               aria-describedby="errorNombre"
+                               required>
+
+                        <div id="errorNombre"
+                             class="text-danger small mt-1"
+                             role="alert"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="tipoAsociado" class="form-label">
+                            Tipo asociado
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="tipoAsociado"
+                               name="tipoAsociado"
+                               th:field="*{tipoAsociado}"
+                               maxlength="150"
+                               aria-describedby="errorTipoAsociado">
+
+                        <div id="errorTipoAsociado"
+                             class="text-danger small mt-1"
+                             role="alert"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="descripcion" class="form-label">
+                            Descripción *
+                        </label>
+
+                        <textarea class="form-control"
+                                  id="descripcion"
+                                  name="descripcion"
+                                  th:field="*{descripcion}"
+                                  rows="2"
+                                  maxlength="500"
+                                  aria-describedby="errorDescripcion"
+                                  required></textarea>
+
+                        <div id="errorDescripcion"
+                             class="text-danger small mt-1"
+                             role="alert"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="categoria" class="form-label">
+                            Categoría *
+                        </label>
+
+                        <select class="form-select"
+                                id="categoria"
+                                name="categoria"
+                                th:field="*{categoria}"
+                                aria-describedby="errorCategoria"
+                                required>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="Documentos">Documentos</option>
+                            <option value="Equipos">Equipos</option>
+                            <option value="N/A">N/A</option>
+                        </select>
+
+                        <div id="errorCategoria"
+                             class="text-danger small mt-1"
+                             role="alert"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="perfil" class="form-label">
+                            Perfil autorizado *
+                        </label>
+
+                        <select class="form-select"
+                                id="perfil"
+                                name="perfil"
+                                th:field="*{perfil}"
+                                aria-describedby="errorPerfil"
+                                required>
+                            <option value="">Selecciona un perfil</option>
+                            <option value="Supervisor">Supervisor</option>
+                            <option value="Líder">Líder</option>
+                            <option value="QC">QC</option>
+                        </select>
+
+                        <div id="errorPerfil"
+                             class="text-danger small mt-1"
+                             role="alert"></div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="contenido" class="form-label">
+                            Contenido de la plantilla *
+                        </label>
+
+                        <textarea class="form-control font-monospace"
+                                  id="contenido"
+                                  name="contenido"
+                                  th:field="*{contenido}"
+                                  rows="6"
+                                  maxlength="10000"
+                                  aria-describedby="ayudaContenido errorContenido"
+                                  required></textarea>
+
+                        <div id="ayudaContenido" class="form-text">
+                            Usa los nombres de las variables entre corchetes.
+                            Ejemplo: [TM], el día [FECHA ERROR].
+                        </div>
+
+                        <div id="errorContenido"
+                             class="text-danger small mt-1"
+                             role="alert"></div>
+                    </div>
+
+                    <!-- Administración de variables -->
+                    <div class="col-12">
+                        <div class="d-flex flex-wrap justify-content-between
+                             align-items-center gap-2 mb-3">
+
+                            <h2 class="h5 mb-0">
+                                Variables y campos obligatorios
+                            </h2>
+
+                            <button type="button"
+                                    id="agregarVariable"
+                                    class="btn btn-outline-primary btn-sm">
+                                Agregar variable
+                            </button>
+                        </div>
+
+                        <p class="text-secondary small">
+                            Escribe el nombre sin corchetes, usando mayúsculas,
+                            números, espacios o guion bajo. Ejemplo: FECHA ERROR.
+                            Se permiten hasta 50 variables.
+                        </p>
+
+                        <div id="errorVariables"
+                             class="text-danger small mb-2"
+                             role="alert"></div>
+
+                        <div class="table-responsive">
+                            <table class="table align-middle tabla-variables">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nombre *</th>
+                                        <th scope="col">Descripción *</th>
+                                        <th scope="col">Obligatoria</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody id="filasVariables">
+                                    <tr th:each="variable, estado : *{variables}">
+                                        <td>
+                                            <input type="text"
+                                                   class="form-control nombre-variable"
+                                                   data-campo="nombre"
+                                                   maxlength="50"
+                                                   pattern="[A-Z][A-Z0-9_ ]{0,49}"
+                                                   aria-label="Nombre de la variable"
+                                                   th:name="|variables[${estado.index}].nombre|"
+                                                   th:value="${variable.nombre}"
+                                                   required>
+                                        </td>
+
+                                        <td>
+                                            <input type="text"
+                                                   class="form-control descripcion-variable"
+                                                   data-campo="descripcion"
+                                                   maxlength="250"
+                                                   aria-label="Descripción de la variable"
+                                                   th:name="|variables[${estado.index}].descripcion|"
+                                                   th:value="${variable.descripcion}"
+                                                   required>
+                                        </td>
+
+                                        <td>
+                                            <input type="checkbox"
+                                                   class="form-check-input"
+                                                   data-campo="obligatoria"
+                                                   value="true"
+                                                   aria-label="Variable obligatoria"
+                                                   th:name="|variables[${estado.index}].obligatoria|"
+                                                   th:checked="${variable.obligatoria}">
+
+                                            <input type="hidden"
+                                                   data-campo="marcador"
+                                                   value="on"
+                                                   th:name="|_variables[${estado.index}].obligatoria|">
+                                        </td>
+
+                                        <td>
+                                            <button type="button"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                    data-quitar>
+                                                Quitar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p id="sinVariables"
+                           class="text-secondary small"
+                           th:hidden="${!#lists.isEmpty(plantilla.variables)}">
+                            No hay variables definidas.
+                            Puedes agregarlas con el botón superior.
+                        </p>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="activa"
+                                   name="activa"
+                                   th:field="*{activa}">
+
+                            <label class="form-check-label" for="activa">
+                                Plantilla activa
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 d-flex flex-wrap justify-content-end gap-3">
+                        <a href="catalogo.html"
+                           th:href="@{/plantillas}"
+                           class="btn btn-outline-secondary">
+                            Volver al catálogo
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            Guardar plantilla
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </main>
+
+        <!-- Modelo de una fila nueva -->
+        <template id="modeloVariable">
+            <tr>
+                <td>
+                    <input type="text"
+                           class="form-control nombre-variable"
+                           data-campo="nombre"
+                           maxlength="50"
+                           pattern="[A-Z][A-Z0-9_ ]{0,49}"
+                           placeholder="Ej. DOCUMENTO"
+                           aria-label="Nombre de la variable"
+                           required>
+                </td>
+
+                <td>
+                    <input type="text"
+                           class="form-control descripcion-variable"
+                           data-campo="descripcion"
+                           maxlength="250"
+                           placeholder="Ej. Código o nombre del documento"
+                           aria-label="Descripción de la variable"
+                           required>
+                </td>
+
+                <td>
+                    <input type="checkbox"
+                           class="form-check-input"
+                           data-campo="obligatoria"
+                           value="true"
+                           aria-label="Variable obligatoria"
+                           checked>
+
+                    <input type="hidden"
+                           data-campo="marcador"
+                           value="on">
+                </td>
+
+                <td>
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            data-quitar>
+                        Quitar
+                    </button>
+                </td>
+            </tr>
+        </template>
+
+        <script>
+            const formulario = document.getElementById("formularioPlantilla");
+            const filasVariables = document.getElementById("filasVariables");
+            const errorVariables = document.getElementById("errorVariables");
+            const agregarVariable = document.getElementById("agregarVariable");
+            const sinVariables = document.getElementById("sinVariables");
+
+            const campos = [
+                ["nombre", "errorNombre", "Escribe un nombre válido."],
+                ["tipoAsociado", "errorTipoAsociado", ""],
+                ["descripcion", "errorDescripcion", "Escribe una descripción válida."],
+                ["categoria", "errorCategoria", "Selecciona una categoría."],
+                ["perfil", "errorPerfil", "Selecciona un perfil autorizado."],
+                ["contenido", "errorContenido", "Escribe el contenido de la plantilla."]
+            ];
+
+            function limpiarCampo(campo) {
+                campo.setCustomValidity("");
+                campo.classList.remove("is-invalid");
+                campo.removeAttribute("aria-invalid");
+            }
+
+            function marcarError(campo, mensaje) {
+                campo.setCustomValidity(mensaje);
+                campo.classList.add("is-invalid");
+                campo.setAttribute("aria-invalid", "true");
+            }
+
+            function actualizarIndices() {
+                const filas = filasVariables.querySelectorAll("tr");
+
+                filas.forEach(function (fila, indice) {
+                    fila.querySelectorAll("[data-campo]").forEach(function (campo) {
+                        const propiedad = campo.dataset.campo;
+
+                        campo.name = propiedad === "marcador"
+                                ? "_variables[" + indice + "].obligatoria"
+                                : "variables[" + indice + "]." + propiedad;
+                    });
+                });
+
+                sinVariables.hidden = filas.length > 0;
+                agregarVariable.disabled = filas.length >= 50;
+            }
+
+            agregarVariable.addEventListener("click", function () {
+                if (filasVariables.rows.length >= 50) {
+                    return;
+                }
+
+                const modelo = document.getElementById("modeloVariable");
+                const fila = modelo.content.firstElementChild.cloneNode(true);
+
+                filasVariables.appendChild(fila);
+                actualizarIndices();
+                errorVariables.textContent = "";
+                fila.querySelector('[data-campo="nombre"]').focus();
+            });
+
+            filasVariables.addEventListener("click", function (evento) {
+                const boton = evento.target.closest("[data-quitar]");
+
+                if (!boton) {
+                    return;
+                }
+
+                boton.closest("tr").remove();
+                actualizarIndices();
+                errorVariables.textContent = "";
+                limpiarErrorContenido();
+                agregarVariable.focus();
+            });
+
+            function limpiarErrorContenido() {
+                limpiarCampo(document.getElementById("contenido"));
+                document.getElementById("errorContenido").textContent = "";
+            }
+
+            function alModificar(evento) {
+                const campo = evento.target;
+
+                if (!campo.matches("input, textarea, select")) {
+                    return;
+                }
+
+                limpiarCampo(campo);
+
+                const configuracion = campos.find(function (item) {
+                    return item[0] === campo.id;
+                });
+
+                if (configuracion) {
+                    document.getElementById(configuracion[1]).textContent = "";
+                }
+
+                if (campo.matches("[data-campo]")) {
+                    errorVariables.textContent = "";
+                    limpiarErrorContenido();
+                }
+            }
+
+            formulario.addEventListener("input", alModificar);
+            formulario.addEventListener("change", alModificar);
+
+            formulario.addEventListener("submit", function (evento) {
+                actualizarIndices();
+
+                let primero = null;
+
+                function registrarError(campo, mensaje) {
+                    marcarError(campo, mensaje);
+
+                    if (primero === null) {
+                        primero = campo;
+                    }
+                }
+
+                // Validación de los campos principales.
+                campos.forEach(function (configuracion) {
+                    const campo = document.getElementById(configuracion[0]);
+                    const error = document.getElementById(configuracion[1]);
+
+                    limpiarCampo(campo);
+                    error.textContent = "";
+
+                    let mensaje = "";
+
+                    if (campo.required && campo.value.trim() === "") {
+                        mensaje = configuracion[2];
+                    } else if (!campo.checkValidity()) {
+                        mensaje = campo.validationMessage;
+                    }
+
+                    if (mensaje) {
+                        registrarError(campo, mensaje);
+                        error.textContent = mensaje;
+                    }
+                });
+
+                // Validación de las variables.
+                const nombres = new Set();
+                const faltantes = [];
+                const mensajesVariables = [];
+                const contenido = document.getElementById("contenido");
+
+                filasVariables.querySelectorAll("tr").forEach(function (fila, indice) {
+                    const nombre = fila.querySelector('[data-campo="nombre"]');
+                    const descripcion =
+                            fila.querySelector('[data-campo="descripcion"]');
+                    const obligatoria =
+                            fila.querySelector('[data-campo="obligatoria"]');
+
+                    limpiarCampo(nombre);
+                    limpiarCampo(descripcion);
+
+                    nombre.value = nombre.value.trim();
+                    descripcion.value = descripcion.value.trim();
+
+                    let mensajeNombre = "";
+
+                    if (!nombre.checkValidity()) {
+                        mensajeNombre =
+                                "Fila " + (indice + 1) +
+                                ": el nombre debe empezar por una letra mayúscula " +
+                                "y usar solo mayúsculas, números, espacios o guion bajo.";
+                    } else if (nombres.has(nombre.value)) {
+                        mensajeNombre =
+                                "La variable [" + nombre.value + "] está repetida.";
+                    }
+
+                    if (mensajeNombre) {
+                        registrarError(nombre, mensajeNombre);
+                        mensajesVariables.push(mensajeNombre);
+                    } else {
+                        nombres.add(nombre.value);
+
+                        if (obligatoria.checked
+                                && !contenido.value.includes("[" + nombre.value + "]")) {
+                            faltantes.push("[" + nombre.value + "]");
+                        }
+                    }
+
+                    if (descripcion.value === "" || !descripcion.checkValidity()) {
+                        const mensaje =
+                                "Fila " + (indice + 1) +
+                                ": escribe una descripción de hasta 250 caracteres.";
+
+                        registrarError(descripcion, mensaje);
+                        mensajesVariables.push(mensaje);
+                    }
+                });
+
+                errorVariables.textContent = mensajesVariables.join(" ");
+
+                if (contenido.value.trim() !== "" && faltantes.length > 0) {
+                    const mensaje =
+                            "Faltan estas variables obligatorias en el texto: " +
+                            faltantes.join(", ");
+
+                    registrarError(contenido, mensaje);
+                    document.getElementById("errorContenido").textContent = mensaje;
+                }
+
+                if (primero !== null) {
+                    evento.preventDefault();
+                    primero.focus();
+                }
+            });
+
+            actualizarIndices();
+        </script>
+    </body>
+</html>
