@@ -1,0 +1,56 @@
+<!-- Fragmento #1 que irá en el head de todas las páginas, así se incluye todo lo necesario de configuración-->
+<head th:fragment="head">
+    <title>SmartNotes</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/webjars/font-awesome/css/all.css}" rel="stylesheet"/>
+    <link th:href="@{/css/smartnotes.css}" rel="stylesheet"/>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</head>
+
+
+<!-- Fragmento #2 define el encabezado de las páginas internas: menú, idioma y cierre de sesión -->
+<header th:fragment="header" class="header">
+    <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
+        <div class="container">
+            <a th:href="@{/}" class="navbar-brand">
+                <i class="fa-solid fa-pen-to-square"></i> [[#{aplicacion.titulo}]]
+            </a>
+            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                <ul class="navbar-nav">
+                    <!-- Cada módulo agrega aquí su opción de menú, usando sec:authorize según el perfil
+                         Ejemplo: sec:authorize="hasRole('ROLE_SUPERVISOR')" -->
+                </ul>
+                <ul class="navbar-nav align-items-sm-center">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                            [[#{plantilla.idioma}]]</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" th:href="@{/(lang=es)}">Español</a></li>
+                            <li><a class="dropdown-item" th:href="@{/(lang=en)}">English</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item px-2 text-white">
+                        <i class="fa-solid fa-user"></i> <span sec:authentication="name"></span>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="btn btn-outline-light btn-sm">
+                                <i class="fa-solid fa-right-from-bracket"></i> [[#{accion.cerrar_sesion}]]
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Fragmento #3 define el footer de las páginas -->
+<footer th:fragment="footer" class="p-2 mt-5 bg-light text-muted d-print-none">
+    <p class="text-center mb-0">[[#{plantilla.derechos}]] &COPY;</p>
+</footer>
