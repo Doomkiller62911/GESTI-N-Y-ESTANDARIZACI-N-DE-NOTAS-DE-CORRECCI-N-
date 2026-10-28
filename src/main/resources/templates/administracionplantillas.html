@@ -30,6 +30,7 @@
     </head>
 
     <body>
+        <header th:replace="~{general/fragmentos :: header}"></header>
         <main class="container py-5">
 
             <p class="fw-bold text-primary">
@@ -43,24 +44,16 @@
                     Administración de plantillas
                 </h1>
 
-                <a href="formularioplantilla.html"
-                   th:href="@{/plantillas/nueva}"
+                <a th:href="@{/plantillas/nueva}"
                    class="btn btn-primary">
                     Nueva plantilla
                 </a>
             </div>
 
             <p class="text-secondary mb-4">
-                Consulta y administra las plantillas disponibles en el sistema.
+                Consulta y administra las plantillas registradas.
             </p>
 
-            <div class="alert alert-info">
-                Los datos se almacenan temporalmente en memoria.
-                Las plantillas nuevas, las modificaciones y los cambios de estado
-                se perderán al reiniciar la aplicación.
-            </div>
-
-            <!-- Mensaje enviado por el controlador después de guardar -->
             <div class="alert alert-success"
                  role="status"
                  th:if="${mensaje != null}"
@@ -77,7 +70,6 @@
                     </h2>
 
                     <span class="badge text-bg-light"
-                          th:if="${plantillas != null}"
                           th:text="|${#lists.size(plantillas)} registradas|">
                         Cantidad de plantillas
                     </span>
@@ -90,33 +82,46 @@
                             <tr>
                                 <th scope="col">Nombre</th>
                                 <th scope="col">Categoría</th>
-                                <th scope="col">Perfil autorizado</th>
+                                <th scope="col">Perfiles autorizados</th>
                                 <th scope="col">Estado</th>
                                 <th scope="col">Acciones</th>
                             </tr>
                         </thead>
 
-                        <tbody id="tablaAdministracion">
-
+                        <tbody>
                             <tr th:each="plantilla : ${plantillas}">
+
                                 <td th:text="${plantilla.nombre}">
                                     Nombre
                                 </td>
 
-                                <td th:text="${plantilla.categoria}">
+                                <td th:text="${plantilla.categoria != null
+                                    ? plantilla.categoria.nombre
+                                    : 'Sin categoría'}">
                                     Categoría
                                 </td>
 
-                                <td th:text="${plantilla.perfil}">
-                                    Perfil autorizado
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <span class="badge text-bg-light"
+                                              th:each="rol : ${plantilla.roles}"
+                                              th:text="${rol.nombre}">
+                                            Perfil
+                                        </span>
+
+                                        <span class="text-secondary small"
+                                              th:if="${#sets.isEmpty(plantilla.roles)}">
+                                            Sin perfiles asignados
+                                        </span>
+                                    </div>
                                 </td>
 
                                 <td>
                                     <span class="badge"
-                                          th:classappend="${plantilla.activa}
+                                          th:classappend="${plantilla.activo}
                                           ? 'text-bg-success'
                                           : 'text-bg-secondary'"
-                                          th:text="${plantilla.activa}
+                                          th:text="${plantilla.activo}
                                           ? 'Activa'
                                           : 'Inactiva'">
                                         Estado
@@ -127,23 +132,27 @@
                                     <div class="d-flex flex-wrap gap-2">
 
                                         <a class="btn btn-outline-primary btn-sm"
-                                           th:href="@{/plantillas/{id}/editar(id=${plantilla.id})}">
+                                           th:href="@{/plantillas/{id}/editar(
+                                           id=${plantilla.idPlantilla}
+                                           )}">
                                             Editar
                                         </a>
 
                                         <form method="post"
-                                              th:action="@{/plantillas/{id}/estado(id=${plantilla.id})}">
+                                              th:action="@{/plantillas/{id}/estado(
+                                              id=${plantilla.idPlantilla}
+                                              )}">
 
                                             <input type="hidden"
                                                    name="activa"
-                                                   th:value="${!plantilla.activa}">
+                                                   th:value="${!plantilla.activo}">
 
                                             <button type="submit"
                                                     class="btn btn-sm"
-                                                    th:classappend="${plantilla.activa}
+                                                    th:classappend="${plantilla.activo}
                                                     ? 'btn-outline-danger'
                                                     : 'btn-outline-success'"
-                                                    th:text="${plantilla.activa}
+                                                    th:text="${plantilla.activo}
                                                     ? 'Desactivar'
                                                     : 'Activar'">
                                                 Cambiar estado
@@ -160,13 +169,12 @@
                                     No hay plantillas registradas.
                                 </td>
                             </tr>
-
                         </tbody>
+
                     </table>
                 </div>
 
-                <a href="catalogo.html"
-                   th:href="@{/plantillas}"
+                <a th:href="@{/plantillas}"
                    class="btn btn-outline-secondary mt-3">
                     Volver al catálogo
                 </a>

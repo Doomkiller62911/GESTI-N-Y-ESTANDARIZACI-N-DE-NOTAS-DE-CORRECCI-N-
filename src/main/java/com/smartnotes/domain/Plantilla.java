@@ -1,197 +1,102 @@
 package com.smartnotes.domain;
 
-import jakarta.validation.Valid;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class Plantilla {
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = "plantilla")
+public class Plantilla implements Serializable {
 
-    private Long id;
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_plantilla")
+    private Integer idPlantilla;
+
+    @NotNull(message = "Selecciona una categoría.")
+    @ManyToOne
+    @JoinColumn(name = "id_categoria", nullable = false)
+    private Categoria categoria;
 
     @NotBlank(message = "El nombre es obligatorio.")
     @Size(
-            max = 150,
-            message = "El nombre no puede superar 150 caracteres."
+            max = 100,
+            message = "El nombre no puede superar 100 caracteres."
     )
+    @Column(unique = true, nullable = false, length = 100)
     private String nombre;
+
+    @Size(
+            max = 100,
+            message = "El tipo asociado no puede superar 100 caracteres."
+    )
+    @Column(name = "tipo_asociado", length = 100)
+    private String tipoAsociado;
 
     @NotBlank(message = "La descripción es obligatoria.")
     @Size(
-            max = 500,
-            message = "La descripción no puede superar 500 caracteres."
+            max = 300,
+            message = "La descripción no puede superar 300 caracteres."
     )
+    @Column(length = 300)
     private String descripcion;
-
-    @Size(
-            max = 150,
-            message = "El tipo asociado no puede superar 150 caracteres."
-    )
-    private String tipoAsociado;
-
-    @NotBlank(message = "Selecciona una categoría.")
-    @Pattern(
-            regexp = "Documentos|Equipos|N/A",
-            message = "La categoría seleccionada no es válida."
-    )
-    private String categoria;
-
-    @NotBlank(message = "Selecciona un perfil autorizado.")
-    @Pattern(
-            regexp = "Supervisor|Líder|QC",
-            message = "El perfil seleccionado no es válido."
-    )
-    private String perfil;
 
     @NotBlank(message = "El contenido es obligatorio.")
     @Size(
             max = 10000,
             message = "El contenido no puede superar 10000 caracteres."
     )
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String contenido;
 
-    private boolean activa;
+    @Column(name = "requiere_evidencia", nullable = false)
+    private boolean requiereEvidencia = false;
 
-    @Valid
-    @Size(
-            max = 50,
-            message = "No se permiten más de 50 variables."
+    @Column(nullable = false)
+    private boolean activo = true;
+
+    @ManyToOne
+    @JoinColumn(name = "id_usuario_modificacion")
+    private Usuario usuarioModificacion;
+
+    @Column(
+            name = "fecha_creacion",
+            insertable = false,
+            updatable = false
     )
-    private List<Variable> variables = new ArrayList<>();
+    private LocalDateTime fechaCreacion;
 
-    public Plantilla() {
-    }
+    @Column(
+            name = "fecha_modificacion",
+            insertable = false,
+            updatable = false
+    )
+    private LocalDateTime fechaModificacion;
 
-    public Long getId() {
-        return id;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "plantilla_rol",
+            joinColumns = @JoinColumn(name = "id_plantilla"),
+            inverseJoinColumns = @JoinColumn(name = "id_rol")
+    )
+    private Set<Rol> roles = new HashSet<>();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getTipoAsociado() {
-        return tipoAsociado;
-    }
-
-    public void setTipoAsociado(String tipoAsociado) {
-        this.tipoAsociado = tipoAsociado;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
-    public String getPerfil() {
-        return perfil;
-    }
-
-    public void setPerfil(String perfil) {
-        this.perfil = perfil;
-    }
-
-    public String getContenido() {
-        return contenido;
-    }
-
-    public void setContenido(String contenido) {
-        this.contenido = contenido;
-    }
-
-    public boolean isActiva() {
-        return activa;
-    }
-
-    public void setActiva(boolean activa) {
-        this.activa = activa;
-    }
-
-    public List<Variable> getVariables() {
-        return variables;
-    }
-
-    public void setVariables(List<Variable> variables) {
-        this.variables = variables == null
-                ? new ArrayList<>()
-                : new ArrayList<>(variables);
-    }
-
-    public static class Variable {
-
-        @NotBlank(message = "El nombre de la variable es obligatorio.")
-        @Pattern(
-                regexp = "[A-Z][A-Z0-9_ ]{0,49}",
-                message = "Usa mayúsculas, números, espacios "
-                + "o guion bajo en la variable."
-        )
-        private String nombre;
-
-        @NotBlank(message = "La descripción de la variable es obligatoria.")
-        @Size(
-                max = 250,
-                message = "La descripción no puede superar 250 caracteres."
-        )
-        private String descripcion;
-
-        private boolean obligatoria;
-
-        public Variable() {
-        }
-
-        public Variable(
-                String nombre,
-                String descripcion,
-                boolean obligatoria) {
-
-            this.nombre = nombre;
-            this.descripcion = descripcion;
-            this.obligatoria = obligatoria;
-        }
-
-        public String getNombre() {
-            return nombre;
-        }
-
-        public void setNombre(String nombre) {
-            this.nombre = nombre;
-        }
-
-        public String getDescripcion() {
-            return descripcion;
-        }
-
-        public void setDescripcion(String descripcion) {
-            this.descripcion = descripcion;
-        }
-
-        public boolean isObligatoria() {
-            return obligatoria;
-        }
-
-        public void setObligatoria(boolean obligatoria) {
-            this.obligatoria = obligatoria;
-        }
-    }
+    @OneToMany(mappedBy = "plantilla")
+    @OrderBy("orden")
+    private List<PlantillaVariable> variables = new ArrayList<>();
 }

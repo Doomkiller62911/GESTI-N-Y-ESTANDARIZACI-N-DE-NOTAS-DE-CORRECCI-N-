@@ -27,24 +27,25 @@
                 min-width: 650px;
             }
 
-            .tabla-variables .nombre-variable {
+            .nombre-variable {
                 min-width: 170px;
             }
 
-            .tabla-variables .descripcion-variable {
+            .descripcion-variable {
                 min-width: 240px;
             }
         </style>
     </head>
 
     <body>
+        <header th:replace="~{general/fragmentos :: header}"></header>
         <main class="container py-5">
             <p class="fw-bold text-primary">
                 SmartNotes · Notas de Planta
             </p>
 
             <h1 class="fw-bold"
-                th:text="${plantilla.id == null}
+                th:text="${plantilla.idPlantilla == null}
                 ? 'Nueva plantilla'
                 : 'Editar plantilla'">
                 Nueva plantilla
@@ -52,13 +53,7 @@
 
             <p class="text-secondary">
                 Los campos con * son obligatorios.
-                Define las variables que utilizará el generador de notas.
             </p>
-
-            <div class="alert alert-info">
-                El guardado es temporal: los datos se perderán
-                al reiniciar la aplicación.
-            </div>
 
             <form class="panel"
                   id="formularioPlantilla"
@@ -67,7 +62,7 @@
                   method="post"
                   novalidate>
 
-                <!-- Errores de validación enviados por Java -->
+                <!-- Errores del servidor -->
                 <div class="alert alert-danger"
                      role="alert"
                      th:if="${#fields.hasAnyErrors()}">
@@ -81,25 +76,27 @@
                     </ul>
                 </div>
 
-                <input type="hidden" th:field="*{id}">
+                <!-- Errores del navegador -->
+                <div id="erroresNavegador"
+                     class="alert alert-danger"
+                     role="alert"
+                     hidden></div>
+
+                <input type="hidden" th:field="*{idPlantilla}">
 
                 <div class="row g-4">
 
                     <div class="col-md-6">
-                        <label for="nombre" class="form-label">Nombre *</label>
+                        <label for="nombre" class="form-label">
+                            Nombre *
+                        </label>
 
                         <input type="text"
                                class="form-control"
                                id="nombre"
-                               name="nombre"
                                th:field="*{nombre}"
-                               maxlength="150"
-                               aria-describedby="errorNombre"
+                               maxlength="100"
                                required>
-
-                        <div id="errorNombre"
-                             class="text-danger small mt-1"
-                             role="alert"></div>
                     </div>
 
                     <div class="col-md-6">
@@ -110,14 +107,8 @@
                         <input type="text"
                                class="form-control"
                                id="tipoAsociado"
-                               name="tipoAsociado"
                                th:field="*{tipoAsociado}"
-                               maxlength="150"
-                               aria-describedby="errorTipoAsociado">
-
-                        <div id="errorTipoAsociado"
-                             class="text-danger small mt-1"
-                             role="alert"></div>
+                               maxlength="100">
                     </div>
 
                     <div class="col-12">
@@ -127,60 +118,58 @@
 
                         <textarea class="form-control"
                                   id="descripcion"
-                                  name="descripcion"
                                   th:field="*{descripcion}"
                                   rows="2"
-                                  maxlength="500"
-                                  aria-describedby="errorDescripcion"
+                                  maxlength="300"
                                   required></textarea>
-
-                        <div id="errorDescripcion"
-                             class="text-danger small mt-1"
-                             role="alert"></div>
                     </div>
 
+                    <!-- Categorías de la base de datos -->
                     <div class="col-md-6">
-                        <label for="categoria" class="form-label">
+                        <label for="idCategoria" class="form-label">
                             Categoría *
                         </label>
 
                         <select class="form-select"
-                                id="categoria"
-                                name="categoria"
-                                th:field="*{categoria}"
-                                aria-describedby="errorCategoria"
+                                id="idCategoria"
+                                th:field="*{idCategoria}"
                                 required>
                             <option value="">Selecciona una categoría</option>
-                            <option value="Documentos">Documentos</option>
-                            <option value="Equipos">Equipos</option>
-                            <option value="N/A">N/A</option>
-                        </select>
 
-                        <div id="errorCategoria"
-                             class="text-danger small mt-1"
-                             role="alert"></div>
+                            <option th:each="categoria : ${categoriasDisponibles}"
+                                    th:value="${categoria.idCategoria}"
+                                    th:text="${categoria.nombre}">
+                                Categoría
+                            </option>
+                        </select>
                     </div>
 
+                    <!-- Roles de la base de datos -->
                     <div class="col-md-6">
-                        <label for="perfil" class="form-label">
-                            Perfil autorizado *
-                        </label>
+                        <fieldset>
+                            <legend class="fs-6">
+                                Perfiles autorizados *
+                            </legend>
 
-                        <select class="form-select"
-                                id="perfil"
-                                name="perfil"
-                                th:field="*{perfil}"
-                                aria-describedby="errorPerfil"
-                                required>
-                            <option value="">Selecciona un perfil</option>
-                            <option value="Supervisor">Supervisor</option>
-                            <option value="Líder">Líder</option>
-                            <option value="QC">QC</option>
-                        </select>
+                            <div class="form-check"
+                                 th:each="rol : ${rolesDisponibles}">
 
-                        <div id="errorPerfil"
-                             class="text-danger small mt-1"
-                             role="alert"></div>
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       th:field="*{idsRoles}"
+                                       th:value="${rol.idRol}">
+
+                                <label class="form-check-label"
+                                       th:for="${#ids.prev('idsRoles')}"
+                                       th:text="${rol.nombre}">
+                                    Perfil
+                                </label>
+                            </div>
+
+                            <p class="small text-secondary mb-0">
+                                Selecciona al menos un perfil.
+                            </p>
+                        </fieldset>
                     </div>
 
                     <div class="col-12">
@@ -190,28 +179,22 @@
 
                         <textarea class="form-control font-monospace"
                                   id="contenido"
-                                  name="contenido"
                                   th:field="*{contenido}"
                                   rows="6"
                                   maxlength="10000"
-                                  aria-describedby="ayudaContenido errorContenido"
+                                  aria-describedby="ayudaContenido"
                                   required></textarea>
 
                         <div id="ayudaContenido" class="form-text">
-                            Usa los nombres de las variables entre corchetes.
-                            Ejemplo: [TM], el día [FECHA ERROR].
+                            Escribe las variables entre corchetes.
+                            Ejemplo: [TM] omitió registrar el documento [DOCUMENTO].
                         </div>
-
-                        <div id="errorContenido"
-                             class="text-danger small mt-1"
-                             role="alert"></div>
                     </div>
 
-                    <!-- Administración de variables -->
+                    <!-- Variables -->
                     <div class="col-12">
                         <div class="d-flex flex-wrap justify-content-between
                              align-items-center gap-2 mb-3">
-
                             <h2 class="h5 mb-0">
                                 Variables y campos obligatorios
                             </h2>
@@ -225,13 +208,9 @@
 
                         <p class="text-secondary small">
                             Escribe el nombre sin corchetes, usando mayúsculas,
-                            números, espacios o guion bajo. Ejemplo: FECHA ERROR.
-                            Se permiten hasta 50 variables.
+                            números, espacios o guion bajo.
+                            Ejemplo: FECHA ERROR. Máximo 50 variables.
                         </p>
-
-                        <div id="errorVariables"
-                             class="text-danger small mb-2"
-                             role="alert"></div>
 
                         <div class="table-responsive">
                             <table class="table align-middle tabla-variables">
@@ -262,7 +241,7 @@
                                             <input type="text"
                                                    class="form-control descripcion-variable"
                                                    data-campo="descripcion"
-                                                   maxlength="250"
+                                                   maxlength="200"
                                                    aria-label="Descripción de la variable"
                                                    th:name="|variables[${estado.index}].descripcion|"
                                                    th:value="${variable.descripcion}"
@@ -296,33 +275,40 @@
                             </table>
                         </div>
 
-                        <p id="sinVariables"
-                           class="text-secondary small"
-                           th:hidden="${!#lists.isEmpty(plantilla.variables)}">
+                        <p id="sinVariables" class="small text-secondary">
                             No hay variables definidas.
-                            Puedes agregarlas con el botón superior.
                         </p>
                     </div>
 
                     <div class="col-12">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="activa"
-                                   name="activa"
-                                   th:field="*{activa}">
+                        <div class="form-check form-switch mb-3">
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   id="activo"
+                                   th:field="*{activo}">
 
-                            <label class="form-check-label" for="activa">
+                            <label class="form-check-label" for="activo">
                                 Plantilla activa
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   id="requiereEvidencia"
+                                   th:field="*{requiereEvidencia}">
+
+                            <label class="form-check-label"
+                                   for="requiereEvidencia">
+                                Requiere evidencia al generar la nota
                             </label>
                         </div>
                     </div>
 
                     <div class="col-12 d-flex flex-wrap justify-content-end gap-3">
-                        <a href="catalogo.html"
-                           th:href="@{/plantillas}"
+                        <a th:href="@{/plantillas/administracion}"
                            class="btn btn-outline-secondary">
-                            Volver al catálogo
+                            Cancelar
                         </a>
 
                         <button type="submit" class="btn btn-primary">
@@ -333,7 +319,7 @@
             </form>
         </main>
 
-        <!-- Modelo de una fila nueva -->
+        <!-- Modelo para agregar filas -->
         <template id="modeloVariable">
             <tr>
                 <td>
@@ -351,8 +337,8 @@
                     <input type="text"
                            class="form-control descripcion-variable"
                            data-campo="descripcion"
-                           maxlength="250"
-                           placeholder="Ej. Código o nombre del documento"
+                           maxlength="200"
+                           placeholder="Descripción del campo"
                            aria-label="Descripción de la variable"
                            required>
                 </td>
@@ -382,36 +368,13 @@
 
         <script>
             const formulario = document.getElementById("formularioPlantilla");
-            const filasVariables = document.getElementById("filasVariables");
-            const errorVariables = document.getElementById("errorVariables");
-            const agregarVariable = document.getElementById("agregarVariable");
+            const filas = document.getElementById("filasVariables");
+            const agregar = document.getElementById("agregarVariable");
             const sinVariables = document.getElementById("sinVariables");
-
-            const campos = [
-                ["nombre", "errorNombre", "Escribe un nombre válido."],
-                ["tipoAsociado", "errorTipoAsociado", ""],
-                ["descripcion", "errorDescripcion", "Escribe una descripción válida."],
-                ["categoria", "errorCategoria", "Selecciona una categoría."],
-                ["perfil", "errorPerfil", "Selecciona un perfil autorizado."],
-                ["contenido", "errorContenido", "Escribe el contenido de la plantilla."]
-            ];
-
-            function limpiarCampo(campo) {
-                campo.setCustomValidity("");
-                campo.classList.remove("is-invalid");
-                campo.removeAttribute("aria-invalid");
-            }
-
-            function marcarError(campo, mensaje) {
-                campo.setCustomValidity(mensaje);
-                campo.classList.add("is-invalid");
-                campo.setAttribute("aria-invalid", "true");
-            }
+            const errores = document.getElementById("erroresNavegador");
 
             function actualizarIndices() {
-                const filas = filasVariables.querySelectorAll("tr");
-
-                filas.forEach(function (fila, indice) {
+                filas.querySelectorAll("tr").forEach(function (fila, indice) {
                     fila.querySelectorAll("[data-campo]").forEach(function (campo) {
                         const propiedad = campo.dataset.campo;
 
@@ -421,171 +384,174 @@
                     });
                 });
 
-                sinVariables.hidden = filas.length > 0;
-                agregarVariable.disabled = filas.length >= 50;
+                sinVariables.hidden = filas.rows.length > 0;
+                agregar.disabled = filas.rows.length >= 50;
             }
 
-            agregarVariable.addEventListener("click", function () {
-                if (filasVariables.rows.length >= 50) {
+            function limpiarErrores() {
+                errores.replaceChildren();
+                errores.hidden = true;
+
+                formulario.querySelectorAll(".is-invalid").forEach(function (campo) {
+                    campo.classList.remove("is-invalid");
+                    campo.removeAttribute("aria-invalid");
+                });
+            }
+
+            agregar.addEventListener("click", function () {
+                if (filas.rows.length >= 50) {
                     return;
                 }
 
                 const modelo = document.getElementById("modeloVariable");
                 const fila = modelo.content.firstElementChild.cloneNode(true);
 
-                filasVariables.appendChild(fila);
+                filas.appendChild(fila);
                 actualizarIndices();
-                errorVariables.textContent = "";
+                limpiarErrores();
+
                 fila.querySelector('[data-campo="nombre"]').focus();
             });
 
-            filasVariables.addEventListener("click", function (evento) {
+            filas.addEventListener("click", function (evento) {
                 const boton = evento.target.closest("[data-quitar]");
 
-                if (!boton) {
-                    return;
+                if (boton) {
+                    boton.closest("tr").remove();
+                    actualizarIndices();
+                    limpiarErrores();
+                    agregar.focus();
                 }
-
-                boton.closest("tr").remove();
-                actualizarIndices();
-                errorVariables.textContent = "";
-                limpiarErrorContenido();
-                agregarVariable.focus();
             });
 
-            function limpiarErrorContenido() {
-                limpiarCampo(document.getElementById("contenido"));
-                document.getElementById("errorContenido").textContent = "";
-            }
-
-            function alModificar(evento) {
-                const campo = evento.target;
-
-                if (!campo.matches("input, textarea, select")) {
-                    return;
-                }
-
-                limpiarCampo(campo);
-
-                const configuracion = campos.find(function (item) {
-                    return item[0] === campo.id;
-                });
-
-                if (configuracion) {
-                    document.getElementById(configuracion[1]).textContent = "";
-                }
-
-                if (campo.matches("[data-campo]")) {
-                    errorVariables.textContent = "";
-                    limpiarErrorContenido();
-                }
-            }
-
-            formulario.addEventListener("input", alModificar);
-            formulario.addEventListener("change", alModificar);
+            formulario.addEventListener("input", limpiarErrores);
+            formulario.addEventListener("change", limpiarErrores);
 
             formulario.addEventListener("submit", function (evento) {
+                limpiarErrores();
                 actualizarIndices();
 
-                let primero = null;
+                const mensajes = [];
+                let primerError = null;
 
                 function registrarError(campo, mensaje) {
-                    marcarError(campo, mensaje);
+                    campo.classList.add("is-invalid");
+                    campo.setAttribute("aria-invalid", "true");
+                    mensajes.push(mensaje);
 
-                    if (primero === null) {
-                        primero = campo;
+                    if (primerError === null) {
+                        primerError = campo;
                     }
                 }
 
-                // Validación de los campos principales.
-                campos.forEach(function (configuracion) {
+                // Campos principales.
+                const principales = [
+                    ["nombre", "Nombre"],
+                    ["tipoAsociado", "Tipo asociado"],
+                    ["descripcion", "Descripción"],
+                    ["idCategoria", "Categoría"],
+                    ["contenido", "Contenido"]
+                ];
+
+                principales.forEach(function (configuracion) {
                     const campo = document.getElementById(configuracion[0]);
-                    const error = document.getElementById(configuracion[1]);
-
-                    limpiarCampo(campo);
-                    error.textContent = "";
-
-                    let mensaje = "";
 
                     if (campo.required && campo.value.trim() === "") {
-                        mensaje = configuracion[2];
+                        registrarError(
+                                campo,
+                                configuracion[1] + ": completa este campo."
+                                );
                     } else if (!campo.checkValidity()) {
-                        mensaje = campo.validationMessage;
-                    }
-
-                    if (mensaje) {
-                        registrarError(campo, mensaje);
-                        error.textContent = mensaje;
+                        registrarError(
+                                campo,
+                                configuracion[1] + ": " + campo.validationMessage
+                                );
                     }
                 });
 
-                // Validación de las variables.
+                // Selección de perfiles.
+                const perfiles = formulario.querySelectorAll(
+                        'input[type="checkbox"][name="idsRoles"]'
+                        );
+
+                if (!Array.from(perfiles).some(campo => campo.checked)) {
+                    mensajes.push("Selecciona al menos un perfil autorizado.");
+
+                    if (primerError === null && perfiles.length > 0) {
+                        primerError = perfiles[0];
+                    }
+                }
+
+                // Variables y contenido.
                 const nombres = new Set();
-                const faltantes = [];
-                const mensajesVariables = [];
                 const contenido = document.getElementById("contenido");
 
-                filasVariables.querySelectorAll("tr").forEach(function (fila, indice) {
+                filas.querySelectorAll("tr").forEach(function (fila, indice) {
                     const nombre = fila.querySelector('[data-campo="nombre"]');
                     const descripcion =
                             fila.querySelector('[data-campo="descripcion"]');
                     const obligatoria =
                             fila.querySelector('[data-campo="obligatoria"]');
 
-                    limpiarCampo(nombre);
-                    limpiarCampo(descripcion);
-
                     nombre.value = nombre.value.trim();
                     descripcion.value = descripcion.value.trim();
 
-                    let mensajeNombre = "";
-
                     if (!nombre.checkValidity()) {
-                        mensajeNombre =
-                                "Fila " + (indice + 1) +
-                                ": el nombre debe empezar por una letra mayúscula " +
-                                "y usar solo mayúsculas, números, espacios o guion bajo.";
+                        registrarError(
+                                nombre,
+                                "Variable " + (indice + 1) +
+                                ": utiliza un nombre válido, empezando por mayúscula."
+                                );
                     } else if (nombres.has(nombre.value)) {
-                        mensajeNombre =
-                                "La variable [" + nombre.value + "] está repetida.";
-                    }
-
-                    if (mensajeNombre) {
-                        registrarError(nombre, mensajeNombre);
-                        mensajesVariables.push(mensajeNombre);
+                        registrarError(
+                                nombre,
+                                "La variable [" + nombre.value + "] está repetida."
+                                );
                     } else {
                         nombres.add(nombre.value);
 
                         if (obligatoria.checked
                                 && !contenido.value.includes("[" + nombre.value + "]")) {
-                            faltantes.push("[" + nombre.value + "]");
+                            registrarError(
+                                    contenido,
+                                    "Falta la variable obligatoria [" +
+                                    nombre.value + "] en el contenido."
+                                    );
                         }
                     }
 
                     if (descripcion.value === "" || !descripcion.checkValidity()) {
-                        const mensaje =
-                                "Fila " + (indice + 1) +
-                                ": escribe una descripción de hasta 250 caracteres.";
-
-                        registrarError(descripcion, mensaje);
-                        mensajesVariables.push(mensaje);
+                        registrarError(
+                                descripcion,
+                                "Variable " + (indice + 1) +
+                                ": escribe una descripción de hasta 200 caracteres."
+                                );
                     }
                 });
 
-                errorVariables.textContent = mensajesVariables.join(" ");
-
-                if (contenido.value.trim() !== "" && faltantes.length > 0) {
-                    const mensaje =
-                            "Faltan estas variables obligatorias en el texto: " +
-                            faltantes.join(", ");
-
-                    registrarError(contenido, mensaje);
-                    document.getElementById("errorContenido").textContent = mensaje;
-                }
-
-                if (primero !== null) {
+                if (mensajes.length > 0) {
                     evento.preventDefault();
-                    primero.focus();
+
+                    const lista = document.createElement("ul");
+                    lista.className = "mb-0";
+
+                    mensajes.forEach(function (mensaje) {
+                        const elemento = document.createElement("li");
+                        elemento.textContent = mensaje;
+                        lista.appendChild(elemento);
+                    });
+
+                    errores.appendChild(lista);
+                    errores.hidden = false;
+
+                    if (primerError !== null) {
+                        primerError.focus();
+                    }
+
+                    errores.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
                 }
             });
 
