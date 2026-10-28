@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Generador de notas</title>
+    <style>
+        :root {
+            --bg: #071b2d;
+            --panel: #0d233a;
+            --panel-alt: #102b44;
+            --line: rgba(174, 200, 230, 0.75);
+            --text: #dfeaf9;
+            --muted: #b2c5de;
+            --primary: #7ab4ff;
+            --primary-strong: #5e9df7;
+            --input: rgba(15, 31, 49, 0.9);
+            --shadow: rgba(0, 0, 0, 0.25);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Consolas", "SFMono-Regular", "Menlo", monospace;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .mock-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 1px solid var(--line);
+            border-bottom: 2px solid var(--line);
+            background: rgba(8, 20, 32, 0.9);
+        }
+
+        .persona-card {
+            min-height: 290px;
+            padding: 18px 22px 16px 22px;
+            border-right: 1px solid var(--line);
+        }
+
+        .persona-card:last-child { border-right: none; }
+
+        .persona-title {
+            display: inline-block;
+            font-size: clamp(2rem, 2vw, 3rem);
+            line-height: 1.1;
+            font-weight: 700;
+            margin-right: 10px;
+            color: var(--text);
+        }
+
+        .persona-body {
+            margin: 0;
+            font-size: clamp(1.1rem, 1.4vw, 1.8rem);
+            line-height: 1.45;
+            color: var(--text);
+            letter-spacing: 0.02em;
+        }
+
+        .panel {
+            background: rgba(12, 25, 39, 0.8);
+            border: 1px solid var(--line);
+            padding: 14px 20px 20px;
+            margin: 20px 0 0 0;
+            box-shadow: 0 10px 22px var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: clamp(1.5rem, 2vw, 2.2rem);
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .nav {
+            display: flex;
+            gap: 18px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .form-shell {
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .field { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        input, select, textarea, button {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid rgba(153, 184, 220, 0.4);
+            background: var(--input);
+            color: var(--text);
+            border-radius: 0;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            accent-color: var(--primary-strong);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .primary, .secondary {
+            cursor: pointer;
+            border: 1px solid var(--line);
+            transition: all 0.2s ease;
+            font-weight: 700;
+        }
+
+        .primary {
+            background: var(--primary);
+            color: #112338;
+        }
+
+        .secondary {
+            background: rgba(122, 180, 255, 0.12);
+            color: var(--text);
+        }
+
+        .preview {
+            background: rgba(9, 22, 34, 0.8);
+            border: 1px solid var(--line);
+            padding: 18px 16px;
+            min-height: 260px;
+            color: var(--text);
+            white-space: pre-line;
+            line-height: 1.65;
+            font-size: 1rem;
+        }
+
+        .alert {
+            margin: 18px 0 0 0;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            font-size: 0.95rem;
+        }
+
+        .alert-error {
+            background: rgba(146, 50, 50, 0.25);
+            color: #ffd4d4;
+            border-color: rgba(255, 154, 154, 0.5);
+        }
+
+        .alert-success {
+            background: rgba(53, 115, 74, 0.18);
+            color: #d9ffe8;
+            border-color: rgba(121, 201, 143, 0.5);
+        }
+
+        .field-error {
+            color: #ffbbbb;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            display: block;
+        }
+
+        @media (max-width: 960px) {
+            .mock-grid,
+            .form-shell { grid-template-columns: 1fr; }
+            .persona-card { border-right: none; border-bottom: 1px solid var(--line); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="mock-grid">
+        <div class="persona-card">
+            <div class="persona-title">Persona<br>2</div>
+            <p class="persona-body">Crear el catálogo de plantillas. Mostrar, buscar y filtrar por nombre, perfil y categoría. Permitir consultar el contenido y sus variables. Crear la administración de plantillas: registrar, editar, activar y desactivar. Aplicar validaciones, permisos y conexión real con la base de datos.</p>
+        </div>
+        <div class="persona-card">
+            <div class="persona-title">Persona<br>3</div>
+            <p class="persona-body">Crear el generador de notas. Seleccionar plantilla y Team Member. Capturar fechas, descripción, corrección y evidencia. Generar vista previa y ensamblar el texto automáticamente. Implementar validaciones, guardado de notas, borradores, edición y recuperación. Permitir adjuntar, validar, eliminar y reemplazar evidencias.</p>
+        </div>
+        <div class="persona-card">
+            <div class="persona-title">Persona<br>4</div>
+            <p class="persona-body">Notas guardadas y módulo del generador funcionando.</p>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Generador de notas</h2>
+            <ul class="nav">
+                <li><a th:href="@{/persona3/generador}">Generador</a></li>
+                <li><a th:href="@{/persona3/notas}">Notas guardadas</a></li>
+            </ul>
+        </div>
+
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div th:if="${preview}" class="alert alert-success">Vista previa generada correctamente.</div>
+
+        <form th:action="@{/persona3/generador/preview}" method="post" th:object="${form}" class="form-shell">
+            <div>
+                <div class="field">
+                    <label for="plantillaId">Plantilla</label>
+                    <select id="plantillaId" th:field="*{plantillaId}">
+                        <option value="">Seleccione...</option>
+                        <option th:each="plantilla : ${plantillas}" th:value="${plantilla.id}" th:text="${plantilla.nombre}"></option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('plantillaId')}" th:errors="*{plantillaId}" class="field-error"></div>
+                </div>
+
+                <div class="field">
+                    <label for="teamMemberId">Miembro del equipo</label>
+                    <select id="teamMemberId" th:field="*{teamMemberId}">
+                        <option value="">Seleccione...</option>
+                        <option th:each="miembro : ${miembros}" th:value="${miembro.id}" th:text="${miembro.nombre + ' - ' + miembro.cargo}"></option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('teamMemberId')}" th:errors="*{teamMemberId}" class="field-error"></div>
+                </div>
+
+                <div class="field">
+                    <label for="fechaInicio">Fecha de inicio</label>
+                    <input id="fechaInicio" type="date" th:field="*{fechaInicio}" />
+                    <div th:if="${#fields.hasErrors('fechaInicio')}" th:errors="*{fechaInicio}" class="field-error"></div>
+                </div>
+
+                <div class="field">
+                    <label for="fechaFin">Fecha final</label>
+                    <input id="fechaFin" type="date" th:field="*{fechaFin}" />
+                    <div th:if="${#fields.hasErrors('fechaFin')}" th:errors="*{fechaFin}" class="field-error"></div>
+                </div>
+
+                <div class="field">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" th:field="*{descripcion}"></textarea>
+                    <div th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}" class="field-error"></div>
+                </div>
+
+                <div class="field">
+                    <label for="correccion">Corrección</label>
+                    <textarea id="correccion" th:field="*{correccion}"></textarea>
+                    <div th:if="${#fields.hasErrors('correccion')}" th:errors="*{correccion}" class="field-error"></div>
+                </div>
+
+                <div class="field">
+                    <label for="evidencia">Evidencias</label>
+                    <textarea id="evidencia" th:field="*{evidencia}" placeholder="Ingrese una evidencia por línea o sepárela por comas"></textarea>
+                </div>
+
+                <div class="field">
+                    <label>
+                        <input type="checkbox" th:field="*{guardarComoBorrador}" /> Guardar como borrador
+                    </label>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="secondary">Vista previa</button>
+                    <button type="submit" formaction="/persona3/generador/guardar" class="primary">Guardar nota</button>
+                </div>
+            </div>
+
+            <div>
+                <h3>Vista previa</h3>
+                <div class="preview" th:text="${preview} ?: 'La vista previa aparecerá aquí al completar los datos.'"></div>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

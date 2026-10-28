@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Detalle de nota</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6fb; margin: 0; padding: 0; }
+        .container { max-width: 900px; margin: 32px auto; background: white; padding: 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,.08); }
+        .meta { display: grid; grid-template-columns: repeat(2, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .card { border: 1px solid #e7edf7; border-radius: 10px; padding: 14px; background: #f9fbff; }
+        .nav { display: flex; gap: 12px; margin-bottom: 20px; }
+        .nav a { text-decoration: none; color: #1f6feb; font-weight: 600; }
+        .content { white-space: pre-line; line-height: 1.6; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="nav">
+        <a th:href="@{/persona3/generador}">Generador</a>
+        <a th:href="@{/persona3/notas}">Notas guardadas</a>
+    </div>
+
+    <h2>Detalle de nota</h2>
+
+    <div class="meta">
+        <div class="card"><strong>ID:</strong> <span th:text="${nota.id}"></span></div>
+        <div class="card"><strong>Estado:</strong> <span th:text="${nota.estado}"></span></div>
+        <div class="card"><strong>Plantilla:</strong> <span th:text="${nota.plantilla.nombre}"></span></div>
+        <div class="card"><strong>Responsable:</strong> <span th:text="${nota.teamMember.nombre}"></span></div>
+        <div class="card"><strong>Fecha inicio:</strong> <span th:text="${#temporals.format(nota.fechaInicio, 'dd/MM/yyyy')}"></span></div>
+        <div class="card"><strong>Fecha fin:</strong> <span th:text="${#temporals.format(nota.fechaFin, 'dd/MM/yyyy')}"></span></div>
+    </div>
+
+    <div class="card">
+        <h3>Contenido generado</h3>
+        <div class="content" th:text="${nota.contenidoGenerado}"></div>
+    </div>
+</div>
+</body>
+</html>
