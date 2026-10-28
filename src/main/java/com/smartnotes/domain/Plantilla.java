@@ -1,91 +1,102 @@
 package com.smartnotes.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "plantilla")
-public class Plantilla {
+public class Plantilla implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_plantilla")
+    private Integer idPlantilla;
 
-    @Column(nullable = false)
+    @NotNull(message = "Selecciona una categoría.")
+    @ManyToOne
+    @JoinColumn(name = "id_categoria", nullable = false)
+    private Categoria categoria;
+
+    @NotBlank(message = "El nombre es obligatorio.")
+    @Size(
+            max = 100,
+            message = "El nombre no puede superar 100 caracteres."
+    )
+    @Column(unique = true, nullable = false, length = 100)
     private String nombre;
 
-    @Column(length = 1000)
+    @Size(
+            max = 100,
+            message = "El tipo asociado no puede superar 100 caracteres."
+    )
+    @Column(name = "tipo_asociado", length = 100)
+    private String tipoAsociado;
+
+    @NotBlank(message = "La descripción es obligatoria.")
+    @Size(
+            max = 300,
+            message = "La descripción no puede superar 300 caracteres."
+    )
+    @Column(length = 300)
     private String descripcion;
 
-    @Column(nullable = false, length = 4000)
-    private String textoBase;
+    @NotBlank(message = "El contenido es obligatorio.")
+    @Size(
+            max = 10000,
+            message = "El contenido no puede superar 10000 caracteres."
+    )
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String contenido;
 
+    @Column(name = "requiere_evidencia", nullable = false)
+    private boolean requiereEvidencia = false;
+
+    @Column(nullable = false)
     private boolean activo = true;
 
-    @OneToMany(mappedBy = "plantilla", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Variable> variables = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "id_usuario_modificacion")
+    private Usuario usuarioModificacion;
 
-    public Plantilla() {
-    }
+    @Column(
+            name = "fecha_creacion",
+            insertable = false,
+            updatable = false
+    )
+    private LocalDateTime fechaCreacion;
 
-    public Plantilla(String nombre, String descripcion, String textoBase, boolean activo) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.textoBase = textoBase;
-        this.activo = activo;
-    }
+    @Column(
+            name = "fecha_modificacion",
+            insertable = false,
+            updatable = false
+    )
+    private LocalDateTime fechaModificacion;
 
-    public Long getId() {
-        return id;
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "plantilla_rol",
+            joinColumns = @JoinColumn(name = "id_plantilla"),
+            inverseJoinColumns = @JoinColumn(name = "id_rol")
+    )
+    private Set<Rol> roles = new HashSet<>();
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getTextoBase() {
-        return textoBase;
-    }
-
-    public void setTextoBase(String textoBase) {
-        this.textoBase = textoBase;
-    }
-
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-    }
-
-    public List<Variable> getVariables() {
-        return variables;
-    }
-
-    public void setVariables(List<Variable> variables) {
-        this.variables = variables;
-    }
-
-    public void addVariable(Variable variable) {
-        variables.add(variable);
-        variable.setPlantilla(this);
-    }
+    @OneToMany(mappedBy = "plantilla")
+    @OrderBy("orden")
+    private List<PlantillaVariable> variables = new ArrayList<>();
 }

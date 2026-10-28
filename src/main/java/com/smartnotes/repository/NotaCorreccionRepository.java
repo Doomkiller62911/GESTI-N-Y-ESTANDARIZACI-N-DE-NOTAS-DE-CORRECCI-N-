@@ -4,10 +4,7 @@ import com.smartnotes.domain.NotaCorreccion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface NotaCorreccionRepository extends JpaRepository<NotaCorreccion, Long> {
+public interface NotaCorreccionRepository extends JpaRepository<NotaCorreccion, Integer> {
 
-    List<NotaCorreccion> findAllByOrderByFechaCreacionDesc();
 }

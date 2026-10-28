@@ -1,178 +1,68 @@
 package com.smartnotes.domain;
 
 import jakarta.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.*;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "nota_correccion")
-public class NotaCorreccion {
+public class NotaCorreccion implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id_nota")
+    private Integer idNota;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "plantilla_id", nullable = false)
-    private Plantilla plantilla;
+    // Usuario que registra la nota
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", nullable = false)
+    private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "team_member_id", nullable = false)
+    // Team Member que cometió el error
+    @ManyToOne
+    @JoinColumn(name = "id_team_member", nullable = false)
     private TeamMember teamMember;
 
-    @Column(nullable = false)
-    private LocalDate fechaInicio;
+    @ManyToOne
+    @JoinColumn(name = "id_plantilla")
+    private Plantilla plantilla;
 
-    @Column(nullable = false)
-    private LocalDate fechaFin;
+    @ManyToOne
+    @JoinColumn(name = "id_categoria")
+    private Categoria categoria;
 
-    @Column(length = 2000)
-    private String descripcion;
+    @Column(name = "fecha_error")
+    private LocalDate fechaError;
 
-    @Column(length = 2000)
-    private String correccion;
+    @Column(name = "fecha_emision")
+    private LocalDate fechaEmision;
 
-    @Column(length = 5000)
+    @Column(name = "descripcion_error", columnDefinition = "TEXT")
+    private String descripcionError;
+
+    @Column(name = "correccion_realizada", columnDefinition = "TEXT")
+    private String correccionRealizada;
+
+    @Column(name = "evidencia_objetiva", columnDefinition = "TEXT")
+    private String evidenciaObjetiva;
+
+    @Column(name = "contenido_generado", columnDefinition = "TEXT")
     private String contenidoGenerado;
 
-    @Column(length = 2000)
-    private String evidencias;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EstadoNota estado = EstadoNota.BORRADOR;
 
-    @Column(nullable = false)
-    private String estado = "BORRADOR";
-
-    @Column(nullable = false)
+    @Column(name = "fecha_creacion", insertable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
-    @Column(nullable = false)
-    private LocalDateTime fechaActualizacion;
-
-    @OneToMany(mappedBy = "nota", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Evidencia> evidenciasAdjuntas = new ArrayList<>();
-
-    @PrePersist
-    public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
-        this.fechaCreacion = now;
-        this.fechaActualizacion = now;
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.fechaActualizacion = LocalDateTime.now();
-    }
-
-    public NotaCorreccion() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Plantilla getPlantilla() {
-        return plantilla;
-    }
-
-    public void setPlantilla(Plantilla plantilla) {
-        this.plantilla = plantilla;
-    }
-
-    public TeamMember getTeamMember() {
-        return teamMember;
-    }
-
-    public void setTeamMember(TeamMember teamMember) {
-        this.teamMember = teamMember;
-    }
-
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(LocalDate fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public LocalDate getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(LocalDate fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getCorreccion() {
-        return correccion;
-    }
-
-    public void setCorreccion(String correccion) {
-        this.correccion = correccion;
-    }
-
-    public String getContenidoGenerado() {
-        return contenidoGenerado;
-    }
-
-    public void setContenidoGenerado(String contenidoGenerado) {
-        this.contenidoGenerado = contenidoGenerado;
-    }
-
-    public String getEvidencias() {
-        return evidencias;
-    }
-
-    public void setEvidencias(String evidencias) {
-        this.evidencias = evidencias;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
-
-    public LocalDateTime getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(LocalDateTime fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
-    public LocalDateTime getFechaActualizacion() {
-        return fechaActualizacion;
-    }
-
-    public void setFechaActualizacion(LocalDateTime fechaActualizacion) {
-        this.fechaActualizacion = fechaActualizacion;
-    }
-
-    public List<Evidencia> getEvidenciasAdjuntas() {
-        return evidenciasAdjuntas;
-    }
-
-    public void setEvidenciasAdjuntas(List<Evidencia> evidenciasAdjuntas) {
-        this.evidenciasAdjuntas = evidenciasAdjuntas;
-    }
-
-    public void addEvidencia(Evidencia evidencia) {
-        evidenciasAdjuntas.add(evidencia);
-        evidencia.setNota(this);
-    }
+    @Column(name = "fecha_modificacion", insertable = false, updatable = false)
+    private LocalDateTime fechaModificacion;
 }
