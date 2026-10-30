@@ -1,0 +1,15 @@
+com\smartnotes\controller\NotaController.class
+com\smartnotes\domain\NotaCorreccion.class
+com\smartnotes\repository\TeamMemberRepository.class
+com\smartnotes\service\TeamMemberService.class
+com\smartnotes\domain\TeamMember.class
+com\smartnotes\SmartNotesApplication.class
+com\smartnotes\domain\Evidencia.class
+com\smartnotes\dto\NotaGeneradorForm.class
+com\smartnotes\repository\NotaCorreccionRepository.class
+com\smartnotes\service\PlantillaService.class
+com\smartnotes\domain\Plantilla.class
+com\smartnotes\repository\PlantillaRepository.class
+com\smartnotes\service\NotaCorreccionService.class
+com\smartnotes\domain\Variable.class
+com\smartnotes\repository\EvidenciaRepository.class
