@@ -4,10 +4,31 @@
  */
 package com.smartnotes.service;
 
-/**
- *
- * @author Maria Celeste
- */
+import com.smartnotes.domain.TeamMember;
+import com.smartnotes.repository.TeamMemberRepository;
+import java.util.List;
+import org.springframework.stereotype.Service;
+
+@Service
 public class TeamMemberService {
-    
+
+    private final TeamMemberRepository teamMemberRepository;
+
+    public TeamMemberService(TeamMemberRepository teamMemberRepository) {
+        this.teamMemberRepository = teamMemberRepository;
+    }
+
+    public List<TeamMember> findAll() {
+        return teamMemberRepository.findAll();
+    }
+
+    public List<TeamMember> findAllActive() {
+        return teamMemberRepository.findByActivoTrue();
+    }
+
+    public TeamMember findById(Integer id) {
+        return teamMemberRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Miembro del equipo no encontrado: " + id));
+    }
 }

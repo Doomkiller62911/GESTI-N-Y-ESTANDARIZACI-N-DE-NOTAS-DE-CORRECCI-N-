@@ -7,10 +7,10 @@ import java.time.LocalDate;
 public class NotaGeneradorForm {
 
     @NotNull(message = "Debe seleccionar una plantilla.")
-    private Long plantillaId;
+    private Integer plantillaId;
 
     @NotNull(message = "Debe seleccionar un miembro del equipo.")
-    private Long teamMemberId;
+    private Integer teamMemberId;
 
     @NotNull(message = "La fecha de inicio es requerida.")
     private LocalDate fechaInicio;
@@ -31,19 +31,19 @@ public class NotaGeneradorForm {
     public NotaGeneradorForm() {
     }
 
-    public Long getPlantillaId() {
+    public Integer getPlantillaId() {
         return plantillaId;
     }
 
-    public void setPlantillaId(Long plantillaId) {
+    public void setPlantillaId(Integer plantillaId) {
         this.plantillaId = plantillaId;
     }
 
-    public Long getTeamMemberId() {
+    public Integer getTeamMemberId() {
         return teamMemberId;
     }
 
-    public void setTeamMemberId(Long teamMemberId) {
+    public void setTeamMemberId(Integer teamMemberId) {
         this.teamMemberId = teamMemberId;
     }
 

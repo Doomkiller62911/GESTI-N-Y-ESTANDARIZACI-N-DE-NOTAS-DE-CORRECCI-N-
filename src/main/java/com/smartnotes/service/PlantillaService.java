@@ -1,5 +1,17 @@
 package com.smartnotes.service;
 
+import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.smartnotes.domain.Categoria;
 import com.smartnotes.domain.Plantilla;
 import com.smartnotes.domain.PlantillaVariable;
@@ -13,17 +25,8 @@ import com.smartnotes.repository.PlantillaVariableRepository;
 import com.smartnotes.repository.RolRepository;
 import com.smartnotes.repository.UsuarioRepository;
 import com.smartnotes.repository.VariableRepository;
+
 import jakarta.validation.Validator;
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
@@ -108,6 +111,14 @@ public class PlantillaService {
         resultado.forEach(this::cargarRelaciones);
 
         return resultado;
+    }
+
+    public List<Plantilla> findAllActive() {
+        return buscarActivas("", "", "");
+    }
+
+    public Plantilla findById(Integer id) {
+        return obtenerPlantilla(id);
     }
 
     @Transactional
@@ -419,5 +430,9 @@ public class PlantillaService {
         )
                 .replaceAll("\\p{M}", "")
                 .toLowerCase(Locale.ROOT);
+    }
+
+    public List<Plantilla> findAll() {
+        return listarTodas();
     }
 }
