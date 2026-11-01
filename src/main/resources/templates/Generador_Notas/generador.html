@@ -81,7 +81,7 @@
                                     th:field="*{idPlantilla}">
                                 <option value="">Selecciona una plantilla</option>
                                 <option th:each="plantilla : ${plantillas}"
-                                        th:value="${idplantilla}"
+                                        th:value="${plantilla.idPlantilla}"
                                         th:text="${plantilla.nombre}">
                                     Plantilla
                                 </option>
@@ -102,8 +102,8 @@
                                     th:field="*{teamMemberId}">
                                 <option value="">Selecciona un miembro</option>
                                 <option th:each="miembro : ${miembros}"
-                                        th:value="${idTeamMember}"
-                                        th:text="${miembro.nombre + ' - ' + puesto}">
+                                        th:value="${miembro.idTeamMember}"
+                                        th:text="${miembro.nombre + ' - ' + miembro.puesto}">
                                     Miembro
                                 </option>
                             </select>

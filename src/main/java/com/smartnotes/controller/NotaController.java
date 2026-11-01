@@ -40,7 +40,7 @@ public class NotaController {
         if (!model.containsAttribute("form")) {
             model.addAttribute("form", new NotaGeneradorForm());
         }
-        return "./generador";
+        return "Generador_Notas/generador";
     }
 
     @PostMapping("/generador/preview")
