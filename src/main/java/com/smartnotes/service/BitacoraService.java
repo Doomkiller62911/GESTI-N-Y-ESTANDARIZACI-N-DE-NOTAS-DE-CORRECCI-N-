@@ -23,7 +23,7 @@ public class BitacoraService {
     @Transactional(readOnly = true)
     public List<NotaCorreccion> buscar(String nombreTeamMember, Integer idCategoria, LocalDate fecha){
         
-        String nombre = ";";
+        String nombre = "";
         if (nombreTeamMember != null) {
             nombre = nombreTeamMember.trim();
         }
