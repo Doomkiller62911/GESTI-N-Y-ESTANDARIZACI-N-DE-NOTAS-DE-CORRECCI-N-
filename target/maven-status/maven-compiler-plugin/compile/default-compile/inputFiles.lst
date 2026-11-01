@@ -1,3 +1,4 @@
+C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\controller\BitacoraController.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\controller\IndexController.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\controller\LoginController.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\controller\NotaController.java
@@ -15,6 +16,7 @@ C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\s
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\dto\NotaGeneradorForm.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\dto\PlantillaFormulario.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\ProjectConfig.java
+C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\repository\BitacoraNotaRepository.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\repository\CategoriaRepository.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\repository\EvidenciaRepository.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\repository\NotaCorreccionRepository.java
@@ -25,6 +27,7 @@ C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\s
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\repository\UsuarioRepository.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\repository\VariableRepository.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\SecurityConfig.java
+C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\service\BitacoraService.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\service\CategoriaService.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\service\NotaCorreccionService.java
 C:\Users\Asus Zenbook\OneDrive\Desktop\VSC-Backup\SmartNotes\src\main\java\com\smartnotes\service\PlantillaService.java

@@ -8,8 +8,11 @@ com\smartnotes\repository\EvidenciaRepository.class
 com\smartnotes\service\UsuarioDetailsService.class
 com\smartnotes\controller\NotaController.class
 com\smartnotes\domain\Rol.class
+com\smartnotes\repository\BitacoraNotaRepository.class
 com\smartnotes\ProjectConfig.class
+com\smartnotes\controller\BitacoraController.class
 com\smartnotes\repository\NotaCorreccionRepository.class
+com\smartnotes\service\BitacoraService.class
 com\smartnotes\service\RolService.class
 com\smartnotes\dto\PlantillaFormulario$VariableFormulario.class
 com\smartnotes\domain\Plantilla.class
