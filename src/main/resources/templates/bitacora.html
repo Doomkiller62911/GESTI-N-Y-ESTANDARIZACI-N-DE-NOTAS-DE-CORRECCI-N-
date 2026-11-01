@@ -85,27 +85,27 @@
                         <span class="logo"><i class="fa-solid fa-pen-to-square"></i></span>
                         <div>
                             <div class="fw-bold lh-1">SmartNotes</div>
-                            <small class="text-secondary">Notas de Planta</small>
+                            <small class="text-secondary" th:text="#{plantilla.notasPlanta}">Notas de Planta</small>
                         </div>
                     </div>
 
-                    <p class="etiqueta px-3 pt-3 mb-2">Operación</p>
+                    <p class="etiqueta px-3 pt-3 mb-2" th:text="#{bitacora.operacion}">Operación</p>
                     <nav class="px-2 d-flex flex-column gap-1">
                         <a class="opcion" th:href="@{/persona3/generador}">
-                            <i class="fa-solid fa-file-pen me-2"></i>Generador de Notas
+                            <i class="fa-solid fa-file-pen me-2"></i><span th:text="#{bitacora.generador}">Generador de Notas</span>
                         </a>
                         <a class="opcion" th:href="@{/plantillas}">
-                            <i class="fa-solid fa-table-cells-large me-2"></i>Catálogo de Plantillas
+                            <i class="fa-solid fa-table-cells-large me-2"></i><span th:text="#{bitacora.catalogo}">Catálogo de Plantillas</span>
                         </a>
                         <a class="opcion opcion-activa" th:href="@{/bitacora}">
-                            <i class="fa-solid fa-clock-rotate-left me-2"></i>Bitácora de Notas
+                            <i class="fa-solid fa-clock-rotate-left me-2"></i><span th:text="#{bitacora.titulo}">Bitácora de Notas</span>
                         </a>
                     </nav>
                 </div>
 
                 <form th:action="@{/logout}" method="post" class="p-2 border-top">
                     <button type="submit" class="opcion text-danger border-0 bg-transparent w-100 text-start">
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>Cerrar Sesión
+                        <i class="fa-solid fa-right-from-bracket me-2"></i><span th:text="#{accion.cerrar_sesion}">Cerrar Sesión</span>
                     </button>
                 </form>
             </aside>
@@ -124,8 +124,8 @@
 
                 <main class="p-4">
 
-                    <h1 class="fw-bold h2 mb-1">Bitácora de Notas</h1>
-                    <p class="text-secondary mb-4">
+                    <h1 class="fw-bold h2 mb-1" th:text="#{bitacora.titulo}">Bitácora de Notas</h1>
+                    <p class="text-secondary mb-4" th:text="#{bitacora.subtitulo}">
                         Consulta y auditoría de notas de corrección registradas.
                     </p>
 
@@ -134,14 +134,14 @@
                         <div class="row g-3">
                             <div class="col-md">
                                 <input type="search" name="nombre" class="form-control"
-                                       placeholder="Buscar por nombre de Team Member..."
+                                       th:placeholder="#{bitacora.buscar}"
                                        th:value="${nombre}">
                             </div>
 
                             <div class="col-md-3">
                                 <select name="idCategoria" class="form-select"
                                         onchange="this.form.submit()">
-                                    <option value="">Todas las categorías</option>
+                                    <option value="" th:text="#{bitacora.todasCategorias}">Todas las categorías</option>
                                     <option th:each="categoria : ${categorias}"
                                             th:value="${categoria.idCategoria}"
                                             th:text="${categoria.nombre}"
@@ -166,22 +166,22 @@
 
                                 <div class="tarjeta-cabecera d-flex justify-content-between
                                      align-items-center">
-                                    <span class="fw-semibold">Notas Registradas</span>
+                                    <span class="fw-semibold" th:text="#{bitacora.notasRegistradas}">Notas Registradas</span>
                                     <span class="chip text-uppercase"
-                                          th:text="|${#lists.size(notas)} registros|">3 registros</span>
+                                          th:text="|${#lists.size(notas)} #{bitacora.registros}|">3 registros</span>
                                 </div>
 
                                 <div class="table-responsive">
                                     <table class="table tabla-bitacora align-middle mb-0">
                                         <thead>
                                             <tr>
-                                                <th>Fecha de registro</th>
-                                                <th>Team Member</th>
-                                                <th>Fecha del error</th>
-                                                <th>Plantilla</th>
-                                                <th>Categoría</th>
-                                                <th>Registrado por</th>
-                                                <th class="text-end">Acciones</th>
+                                                <th th:text="#{bitacora.col.fechaRegistro}">Fecha de registro</th>
+                                                <th th:text="#{bitacora.col.teamMember}">Team Member</th>
+                                                <th th:text="#{bitacora.col.fechaError}">Fecha del error</th>
+                                                <th th:text="#{bitacora.col.plantilla}">Plantilla</th>
+                                                <th th:text="#{bitacora.col.categoria}">Categoría</th>
+                                                <th th:text="#{bitacora.col.registradoPor}">Registrado por</th>
+                                                <th class="text-end" th:text="#{bitacora.col.acciones}">Acciones</th>
                                             </tr>
                                         </thead>
 
@@ -224,14 +224,16 @@
                                                        ? 'btn-primary' : 'btn-light'"
                                                        th:href="@{/bitacora(id=${nota.idNota},
                                                        nombre=${nombre}, idCategoria=${idCategoria},
-                                                       fecha=${fecha})}">
+                                                       fecha=${fecha})}"
+                                                       th:text="#{bitacora.verNota}">
                                                         Ver nota
                                                     </a>
                                                 </td>
                                             </tr>
 
                                             <tr th:if="${#lists.isEmpty(notas)}">
-                                                <td colspan="7" class="text-center text-secondary py-4">
+                                                <td colspan="7" class="text-center text-secondary py-4"
+                                                    th:text="#{bitacora.sinResultados}">
                                                     No se encontraron notas con esos filtros.
                                                 </td>
                                             </tr>
@@ -241,10 +243,10 @@
 
                                 <div class="tarjeta-cabecera d-flex justify-content-between
                                      small text-secondary">
-                                    <span th:text="|Filtrado: ${#lists.size(notas)} registros|">
+                                    <span th:text="|#{bitacora.filtrado}: ${#lists.size(notas)} #{bitacora.registros}|">
                                         Filtrado: 3 registros
                                     </span>
-                                    <span>Página 1 de 1</span>
+                                    <span th:text="#{bitacora.pagina}">Página 1 de 1</span>
                                 </div>
                             </div>
                         </section>
@@ -257,15 +259,15 @@
                                      align-items-center">
                                     <span class="etiqueta">
                                         <i class="fa-solid fa-eye text-primary me-1"></i>
-                                        Detalle de la nota
+                                        <span th:text="#{bitacora.detalle}">Detalle de la nota</span>
                                     </span>
                                     <span class="chip">
-                                        <i class="fa-solid fa-lock me-1"></i>Solo lectura
+                                        <i class="fa-solid fa-lock me-1"></i><span th:text="#{bitacora.soloLectura}">Solo lectura</span>
                                     </span>
                                 </div>
 
                                 <div class="p-3" th:if="${seleccionada == null}">
-                                    <p class="text-secondary mb-0">
+                                    <p class="text-secondary mb-0" th:text="#{bitacora.seleccione}">
                                         Selecciona Ver nota en la tabla para consultar
                                         su contenido completo.
                                     </p>
@@ -292,7 +294,7 @@
                                     </div>
 
                                     <div>
-                                        <div class="etiqueta mb-1">Texto ensamblado de la nota</div>
+                                        <div class="etiqueta mb-1" th:text="#{bitacora.textoEnsamblado}">Texto ensamblado de la nota</div>
                                         <div class="caja-gris text-break"
                                              style="white-space: pre-wrap;"
                                              th:text="${seleccionada.contenidoGenerado != null
@@ -300,28 +302,28 @@
                                     </div>
 
                                     <div>
-                                        <div class="etiqueta mb-1">Evidencia objetiva</div>
+                                        <div class="etiqueta mb-1" th:text="#{bitacora.evidencia}">Evidencia objetiva</div>
                                         <div class="caja-gris d-flex gap-2">
                                             <i class="fa-solid fa-circle-check text-primary mt-1"></i>
                                             <span class="text-break"
                                                   th:text="${seleccionada.evidenciaObjetiva != null
                                                   ? seleccionada.evidenciaObjetiva
-                                                  : 'Sin evidencia registrada'}">Evidencia</span>
+                                                  : #messages.msg('bitacora.sinEvidencia')}">Evidencia</span>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <div class="etiqueta mb-1">Datos de registro</div>
+                                        <div class="etiqueta mb-1" th:text="#{bitacora.datosRegistro}">Datos de registro</div>
                                         <div class="caja-gris small">
                                             <div class="d-flex justify-content-between mb-2">
-                                                <span class="text-secondary">Registrado por:</span>
+                                                <span class="text-secondary" th:text="|#{bitacora.col.registradoPor}:|">Registrado por:</span>
                                                 <span class="fw-medium text-end"
                                                       th:text="|${seleccionada.usuario.nombre} ${seleccionada.usuario.apellidoPaterno} (${seleccionada.usuario.puesto})|">
                                                     Usuario
                                                 </span>
                                             </div>
                                             <div class="d-flex justify-content-between mb-2">
-                                                <span class="text-secondary">Fecha de registro:</span>
+                                                <span class="text-secondary" th:text="|#{bitacora.col.fechaRegistro}:|">Fecha de registro:</span>
                                                 <span th:text="${seleccionada.fechaCreacion != null
                                                       ? #temporals.format(seleccionada.fechaCreacion, 'dd/MM/yyyy')
                                                       : (seleccionada.fechaEmision != null
@@ -329,7 +331,7 @@
                                                       : '-')}">12/09/2024</span>
                                             </div>
                                             <div class="d-flex justify-content-between mb-3">
-                                                <span class="text-secondary">Fecha del error:</span>
+                                                <span class="text-secondary" th:text="|#{bitacora.col.fechaError}:|">Fecha del error:</span>
                                                 <span th:text="${seleccionada.fechaError != null
                                                       ? #temporals.format(seleccionada.fechaError, 'dd/MM/yyyy')
                                                       : '-'}">10/09/2024</span>
@@ -338,7 +340,7 @@
                                             <button type="button"
                                                     class="btn btn-primary btn-sm w-100 d-print-none"
                                                     onclick="window.print()">
-                                                <i class="fa-solid fa-download me-1"></i>Exportar PDF
+                                                <i class="fa-solid fa-download me-1"></i><span th:text="#{bitacora.exportar}">Exportar PDF</span>
                                             </button>
                                         </div>
                                     </div>
