@@ -243,19 +243,19 @@
         <form th:action="@{/persona3/generador/preview}" method="post" th:object="${form}" class="form-shell">
             <div>
                 <div class="field">
-                    <label for="plantillaId">Plantilla</label>
-                    <select id="plantillaId" th:field="*{plantillaId}">
+                    <label for="idPlantilla">Plantilla</label>
+                    <select id="idPlantilla" th:field="*{idPlantilla}">
                         <option value="">Seleccione...</option>
-                        <option th:each="plantilla : ${plantillas}" th:value="${plantilla.id}" th:text="${plantilla.nombre}"></option>
+                        <option th:each="plantilla : ${plantillas}" th:value="${idplantilla}" th:text="${plantilla.nombre}"></option>
                     </select>
-                    <div th:if="${#fields.hasErrors('plantillaId')}" th:errors="*{plantillaId}" class="field-error"></div>
+                    <div th:if="${#fields.hasErrors('idPlantilla')}" th:errors="*{idPlantilla}" class="field-error"></div>
                 </div>
 
                 <div class="field">
                     <label for="teamMemberId">Miembro del equipo</label>
                     <select id="teamMemberId" th:field="*{teamMemberId}">
                         <option value="">Seleccione...</option>
-                        <option th:each="miembro : ${miembros}" th:value="${miembro.id}" th:text="${miembro.nombre + ' - ' + miembro.cargo}"></option>
+                        <option th:each="miembro : ${miembros}" th:value="${idTeamMember}" th:text="${miembro.nombre + ' - ' + puesto}"></option>
                     </select>
                     <div th:if="${#fields.hasErrors('teamMemberId')}" th:errors="*{teamMemberId}" class="field-error"></div>
                 </div>
