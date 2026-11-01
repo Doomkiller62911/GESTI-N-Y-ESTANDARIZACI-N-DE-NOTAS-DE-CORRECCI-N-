@@ -1,19 +1,23 @@
 package com.smartnotes.controller;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import com.smartnotes.dto.NotaGeneradorForm;
 import com.smartnotes.service.NotaCorreccionService;
 import com.smartnotes.service.PlantillaService;
 import com.smartnotes.service.TeamMemberService;
-import jakarta.validation.Valid;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/persona3")
+@RequestMapping("/Generador_Notas")
 public class NotaController {
 
     private final PlantillaService plantillaService;
@@ -36,7 +40,7 @@ public class NotaController {
         if (!model.containsAttribute("form")) {
             model.addAttribute("form", new NotaGeneradorForm());
         }
-        return "persona3/generador";
+        return "./generador";
     }
 
     @PostMapping("/generador/preview")
@@ -47,11 +51,11 @@ public class NotaController {
         model.addAttribute("miembros", teamMemberService.findAll());
 
         if (bindingResult.hasErrors()) {
-            return "persona3/generador";
+            return "Generador_Notas/generador";
         }
 
         model.addAttribute("preview", notaCorreccionService.generarVistaPrevia(form));
-        return "persona3/generador";
+        return "Generador_Notas/generador";
     }
 
     @PostMapping("/generador/guardar")
@@ -62,28 +66,28 @@ public class NotaController {
         model.addAttribute("miembros", teamMemberService.findAll());
 
         if (bindingResult.hasErrors()) {
-            return "persona3/generador";
+            return "Generador_Notas/generador";
         }
 
         try {
             var nota = notaCorreccionService.guardar(form);
-            return "redirect:/persona3/notas/" + nota.getIdNota();
+            return "redirect:/Generador_Notas/notas/" + nota.getIdNota();
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
-            return "persona3/generador";
+            return "Generador_Notas/generador";
         }
     }
 
     @GetMapping("/notas")
     public String listarNotas(Model model) {
         model.addAttribute("notas", notaCorreccionService.findAll());
-        return "persona3/lista";
+        return "Generador_Notas/lista";
     }
 
     @GetMapping("/notas/{id}")
     public String detalleNota(@PathVariable Integer id, Model model) {
         model.addAttribute("nota", notaCorreccionService.findById(id));
-        return "persona3/detalle";
+        return "Generador_Notas/detalle";
     }
 
     @GetMapping("/notas/{id}/editar")
@@ -101,7 +105,7 @@ public class NotaController {
         model.addAttribute("plantillas", plantillaService.findAllActive());
         model.addAttribute("miembros", teamMemberService.findAll());
         model.addAttribute("notaId", id);
-        return "persona3/generador";
+        return "Generador_Notas/generador";
     }
 
     @PostMapping("/notas/{id}/editar")
@@ -114,27 +118,27 @@ public class NotaController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("notaId", id);
-            return "persona3/generador";
+            return "Generador_Notas/generador";
         }
 
         try {
             notaCorreccionService.actualizar(id, form);
-            return "redirect:/persona3/notas/" + id;
+            return "redirect:/Generador_Notas/notas/" + id;
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("notaId", id);
-            return "persona3/generador";
+            return "Generador_Notas/generador";
         }
     }
 
     @PostMapping("/notas/{id}/eliminar")
     public String eliminarNota(@PathVariable Integer id) {
         notaCorreccionService.eliminar(id);
-        return "redirect:/persona3/notas";
+        return "redirect:/Generador_Notas/notas";
     }
 
     @GetMapping("/")
     public String index() {
-        return "redirect:/persona3/generador";
+        return "redirect:/Generador_Notas/generador";
     }
 }
