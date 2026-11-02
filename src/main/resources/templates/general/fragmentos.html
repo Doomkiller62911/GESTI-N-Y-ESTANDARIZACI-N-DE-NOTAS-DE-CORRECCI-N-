@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
     <head th:fragment="head">
         <title>SmartNotes</title>
@@ -19,10 +18,42 @@
 
         <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}">
         </script>
+
+        <style>
+            .sn-panel {
+                background: white;
+                border: 1px solid #e6e9f0;
+                border-radius: 12px;
+                padding: 24px;
+            }
+
+            .sn-texto-plantilla {
+                background: #f3f6ff;
+                border-radius: 8px;
+                padding: 20px;
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+            }
+
+            .sn-vista-previa {
+                min-height: 260px;
+                white-space: pre-line;
+                overflow-wrap: anywhere;
+            }
+
+            .sn-tabla {
+                font-size: 0.9rem;
+            }
+
+            .sn-tabla .btn {
+                white-space: nowrap;
+            }
+        </style>
     </head>
 
     <body>
 
+        <!-- Menú lateral -->
         <aside th:fragment="header"
                class="sn-sidebar d-print-none"
                aria-label="Navegación principal">
@@ -187,10 +218,6 @@
                     .sn-nav-scroll {
                         overflow: visible;
                     }
-
-                    .sn-logout {
-                        margin-top: 14px;
-                    }
                 }
 
                 @media print {
@@ -204,14 +231,13 @@
                 }
             </style>
 
-            <!-- Logo: volver a Inicio -->
+            <!-- Logo: regresar a Inicio -->
             <a class="sn-brand"
                th:href="@{/}"
                aria-label="SmartNotes: volver a Inicio">
 
                 <span class="sn-logo" aria-hidden="true">
-                    <svg width="25"
-                         height="25"
+                    <svg width="25" height="25"
                          viewBox="0 0 24 24"
                          fill="none"
                          stroke="currentColor"
@@ -228,7 +254,6 @@
                 </span>
             </a>
 
-            <!-- Menú izquierdo -->
             <div class="sn-nav-scroll">
                 <p class="sn-caption">OPERACIÓN</p>
 
@@ -288,13 +313,12 @@
                 </nav>
             </div>
 
-            <!-- Cerrar sesión al fondo -->
+            <!-- Cerrar sesión -->
             <form class="sn-logout"
                   th:action="@{/logout}"
                   method="post">
 
                 <button class="sn-link" type="submit">
-
                     <svg viewBox="0 0 24 24"
                          fill="none"
                          stroke="currentColor"
@@ -309,13 +333,11 @@
                 </button>
             </form>
 
-            <!-- Resaltar la sección actual -->
+            <!-- Resaltar la opción actual -->
             <script>
                 (function () {
                     const menu = document.currentScript.closest(".sn-sidebar");
-
-                    const ruta =
-                            window.location.pathname.replace(/\/$/, "") || "/";
+                    const ruta = window.location.pathname.replace(/\/$/, "") || "/";
 
                     const enlaces = Array.from(
                             menu.querySelectorAll("[data-sn-path]")
@@ -348,6 +370,40 @@
 
         </aside>
 
+        <!-- Identificación del usuario como en el prototipo -->
+        <div th:fragment="usuarioActual"
+             th:if="${nombreUsuarioSesion != null}"
+             class="d-flex justify-content-end align-items-center gap-3 mb-4">
+
+            <div class="text-end">
+                <div class="fw-semibold"
+                     style="color: #122438;"
+                     th:text="${nombreUsuarioSesion}">
+                    Admin Sistema
+                </div>
+
+                <div class="small text-secondary"
+                     th:text="${puestoUsuarioSesion}">
+                    Administrador del sistema
+                </div>
+            </div>
+
+            <span class="d-inline-flex align-items-center
+                  justify-content-center rounded-circle
+                  text-white flex-shrink-0"
+                  style="width: 44px; height: 44px; background: #004bd6;"
+                  aria-hidden="true">
+
+                <svg width="26" height="26"
+                     viewBox="0 0 24 24"
+                     fill="currentColor">
+                <circle cx="12" cy="7" r="4"></circle>
+                <path d="M4 21v-2a8 8 0 0 1 16 0v2Z"></path>
+                </svg>
+            </span>
+        </div>
+
+        <!-- Pie de página -->
         <footer th:fragment="footer"
                 class="p-2 mt-5 bg-light text-muted d-print-none">
 

@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.smartnotes.service.UsuarioService;
+import java.security.Principal;
 
 @Controller
 public class PlantillaController {
@@ -31,15 +33,48 @@ public class PlantillaController {
     private final PlantillaService plantillaService;
     private final CategoriaRepository categoriaRepository;
     private final RolRepository rolRepository;
+    private final UsuarioService usuarioService;
 
     public PlantillaController(
             PlantillaService plantillaService,
             CategoriaRepository categoriaRepository,
-            RolRepository rolRepository) {
+            RolRepository rolRepository,
+            UsuarioService usuarioService) {
 
         this.plantillaService = plantillaService;
         this.categoriaRepository = categoriaRepository;
         this.rolRepository = rolRepository;
+        this.usuarioService = usuarioService;
+    }
+
+    @ModelAttribute
+    public void prepararUsuarioCabecera(
+            Principal principal,
+            Model model) {
+
+        if (principal == null) {
+            return;
+        }
+
+        usuarioService.getUsuarioPorUsername(principal.getName())
+                .ifPresent(usuario -> {
+                    model.addAttribute(
+                            "nombreUsuarioSesion",
+                            usuario.getNombre()
+                            + " "
+                            + usuario.getApellidoPaterno()
+                    );
+
+                    model.addAttribute(
+                            "puestoUsuarioSesion",
+                            usuario.getPuesto()
+                    );
+
+                    model.addAttribute(
+                            "rolUsuarioSesion",
+                            usuario.getRol().getNombre()
+                    );
+                });
     }
 
     @InitBinder("plantilla")
@@ -89,8 +124,8 @@ public class PlantillaController {
         List<Plantilla> disponibles = plantillaService
                 .buscarActivas(nombre, perfil, categoria)
                 .stream()
-                .filter(plantilla ->
-                        puedeUsar(plantilla, autenticacion)
+                .filter(plantilla
+                        -> puedeUsar(plantilla, autenticacion)
                 )
                 .toList();
 
@@ -103,8 +138,8 @@ public class PlantillaController {
                 ? null
                 : plantillaService.buscarPorId(id)
                         .filter(Plantilla::isActivo)
-                        .filter(plantilla ->
-                                puedeUsar(plantilla, autenticacion)
+                        .filter(plantilla
+                                -> puedeUsar(plantilla, autenticacion)
                         )
                         .orElse(null);
 
@@ -196,8 +231,7 @@ public class PlantillaController {
 
     @PostMapping("/plantillas/guardar")
     public String guardarPlantilla(
-            @Valid @ModelAttribute("plantilla")
-            PlantillaFormulario formulario,
+            @Valid @ModelAttribute("plantilla") PlantillaFormulario formulario,
             BindingResult resultado,
             Authentication autenticacion,
             RedirectAttributes mensajes) {
@@ -224,7 +258,7 @@ public class PlantillaController {
             resultado.reject(
                     "plantilla.integridad",
                     "No se pudo guardar. Revisa si el nombre de la "
-                            + "plantilla o de alguna variable ya existe."
+                    + "plantilla o de alguna variable ya existe."
             );
 
             return "formularioplantilla";
@@ -245,8 +279,8 @@ public class PlantillaController {
         return autenticacion != null
                 && autenticacion.isAuthenticated()
                 && autenticacion.getAuthorities().stream()
-                        .anyMatch(rol ->
-                                autoridad.equals(rol.getAuthority())
+                        .anyMatch(rol
+                                -> autoridad.equals(rol.getAuthority())
                         );
     }
 
@@ -270,8 +304,8 @@ public class PlantillaController {
         }
 
         return plantilla.getRoles().stream()
-                .anyMatch(rol ->
-                        tieneRol(
+                .anyMatch(rol
+                        -> tieneRol(
                                 autenticacion,
                                 "ROLE_" + rol.getNombre()
                         )

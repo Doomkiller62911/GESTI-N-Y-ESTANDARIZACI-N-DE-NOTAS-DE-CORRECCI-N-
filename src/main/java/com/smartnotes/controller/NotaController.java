@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
+import com.smartnotes.service.UsuarioService;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/Generador_Notas")
@@ -25,15 +27,48 @@ public class NotaController {
     private final PlantillaService plantillaService;
     private final TeamMemberService teamMemberService;
     private final NotaCorreccionService notaCorreccionService;
+    private final UsuarioService usuarioService;
 
     public NotaController(
             PlantillaService plantillaService,
             TeamMemberService teamMemberService,
-            NotaCorreccionService notaCorreccionService) {
+            NotaCorreccionService notaCorreccionService,
+            UsuarioService usuarioService) {
 
         this.plantillaService = plantillaService;
         this.teamMemberService = teamMemberService;
         this.notaCorreccionService = notaCorreccionService;
+        this.usuarioService = usuarioService;
+    }
+
+    @ModelAttribute
+    public void prepararUsuarioCabecera(
+            Principal principal,
+            Model model) {
+
+        if (principal == null) {
+            return;
+        }
+
+        usuarioService.getUsuarioPorUsername(principal.getName())
+                .ifPresent(usuario -> {
+                    model.addAttribute(
+                            "nombreUsuarioSesion",
+                            usuario.getNombre()
+                            + " "
+                            + usuario.getApellidoPaterno()
+                    );
+
+                    model.addAttribute(
+                            "puestoUsuarioSesion",
+                            usuario.getPuesto()
+                    );
+
+                    model.addAttribute(
+                            "rolUsuarioSesion",
+                            usuario.getRol().getNombre()
+                    );
+                });
     }
 
     // Abrir el generador, opcionalmente con una plantilla seleccionada.
@@ -59,8 +94,8 @@ public class NotaController {
             if (plantillaId != null) {
                 var plantilla = plantillaService.buscarPorId(plantillaId)
                         .filter(p -> p.isActivo())
-                        .orElseThrow(() ->
-                                new ResponseStatusException(
+                        .orElseThrow(()
+                                -> new ResponseStatusException(
                                         HttpStatus.NOT_FOUND,
                                         "La plantilla no existe o está inactiva."
                                 )
@@ -68,12 +103,12 @@ public class NotaController {
 
                 boolean autorizado = autenticacion != null
                         && autenticacion.getAuthorities().stream()
-                                .anyMatch(autoridad ->
-                                        autoridad.getAuthority()
+                                .anyMatch(autoridad
+                                        -> autoridad.getAuthority()
                                                 .equals("ROLE_ADMIN")
                                         || plantilla.getRoles().stream()
-                                                .anyMatch(rol ->
-                                                        autoridad.getAuthority()
+                                                .anyMatch(rol
+                                                        -> autoridad.getAuthority()
                                                                 .equals(
                                                                         "ROLE_"
                                                                         + rol.getNombre()
@@ -85,7 +120,7 @@ public class NotaController {
                     throw new ResponseStatusException(
                             HttpStatus.FORBIDDEN,
                             "Tu perfil no está autorizado "
-                                    + "para usar esta plantilla."
+                            + "para usar esta plantilla."
                     );
                 }
 
