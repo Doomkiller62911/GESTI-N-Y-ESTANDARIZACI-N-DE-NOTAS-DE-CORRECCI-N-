@@ -16,21 +16,6 @@
                 color: #122438;
             }
 
-            .barra-lateral {
-                background: white;
-                border-right: 1px solid #e6e9f0;
-            }
-
-            .marca {
-                font-weight: bold;
-            }
-
-            .opcion-activa {
-                background: #e5edff;
-                color: #004bd6;
-                font-weight: 600;
-            }
-
             .panel {
                 background: white;
                 border: 1px solid #e6e9f0;
@@ -57,319 +42,298 @@
     </head>
 
     <body>
-        <header th:replace="~{general/fragmentos :: header}"></header>
-        <div class="container-fluid">
-            <div class="row min-vh-100">
+        <aside th:replace="~{general/fragmentos :: header}"></aside>
 
-                <aside class="col-md-3 col-xl-2 barra-lateral p-4">
-                    <h2 class="marca h4 mb-1">SmartNotes</h2>
-                    <p class="text-secondary mb-5">Notas de Planta</p>
+        <main class="container-fluid p-4 p-lg-5">
 
-                    <p class="small text-secondary">OPERACIÓN</p>
+            <h1 class="fw-bold">Catálogo de Plantillas</h1>
 
-                    <nav aria-label="Menú principal">
-                        <ul class="nav flex-column gap-2">
-                            <li class="nav-item">
-                                <span class="nav-link text-secondary">
-                                    Generador de Notas
-                                </span>
-                            </li>
+            <p class="text-secondary mb-4">
+                Consulta y previsualización de plantillas preaprobadas
+                por perfil y categoría operativa.
+            </p>
 
-                            <li class="nav-item">
-                                <a class="nav-link opcion-activa rounded"
-                                   th:href="@{/plantillas}"
-                                   aria-current="page">
-                                    Catálogo de Plantillas
-                                </a>
-                            </li>
+            <!-- Solo ADMIN puede crear plantillas -->
+            <div class="d-flex justify-content-end mb-3"
+                 th:if="${esAdministrador}">
 
-                            <li class="nav-item">
-                                <span class="nav-link text-secondary">
-                                    Bitácora de Notas
-                                </span>
-                            </li>
-                        </ul>
-                    </nav>
-                </aside>
+                <a th:href="@{/plantillas/nueva}"
+                   class="btn btn-primary">
+                    Nueva plantilla
+                </a>
+            </div>
 
-                <main class="col-md-9 col-xl-10 p-4 p-lg-5">
-                    <h1 class="fw-bold">Catálogo de Plantillas</h1>
+            <!-- Búsqueda y filtros -->
+            <section class="panel mb-4"
+                     aria-label="Filtros de plantillas">
 
-                    <p class="text-secondary mb-4">
-                        Consulta las plantillas activas por perfil y categoría.
-                    </p>
+                <form method="get" th:action="@{/plantillas}">
+                    <div class="row g-3 align-items-end">
 
-                    <div class="d-flex flex-wrap justify-content-end gap-2 mb-3"
-                         th:if="${esAdministrador}">
-                        <a th:href="@{/plantillas/nueva}"
-                           class="btn btn-primary">
-                            Nueva plantilla
-                        </a>
+                        <div class="col-lg-4">
+                            <label for="nombre" class="form-label">
+                                Buscar plantilla
+                            </label>
 
-                        <a th:href="@{/plantillas/administracion}"
-                           class="btn btn-outline-primary">
-                            Administrar plantillas
-                        </a>
+                            <input type="search"
+                                   id="nombre"
+                                   name="nombre"
+                                   class="form-control"
+                                   placeholder="Buscar por nombre..."
+                                   th:value="${nombre}">
+                        </div>
+
+                        <div class="col-lg-3">
+                            <label for="perfil" class="form-label">
+                                Perfil
+                            </label>
+
+                            <select id="perfil"
+                                    name="perfil"
+                                    class="form-select">
+
+                                <option value=""
+                                        th:selected="${perfil == ''}">
+                                    Todos los perfiles
+                                </option>
+
+                                <option th:each="opcionRol : ${rolesDisponibles}"
+                                        th:value="${opcionRol.nombre}"
+                                        th:text="${opcionRol.nombre}"
+                                        th:selected="${opcionRol.nombre == perfil}">
+                                    Perfil
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-3">
+                            <label for="categoria" class="form-label">
+                                Categoría
+                            </label>
+
+                            <select id="categoria"
+                                    name="categoria"
+                                    class="form-select">
+
+                                <option value=""
+                                        th:selected="${categoria == ''}">
+                                    Todas las categorías
+                                </option>
+
+                                <option th:each="opcionCategoria : ${categoriasDisponibles}"
+                                        th:value="${opcionCategoria.nombre}"
+                                        th:text="${opcionCategoria.nombre}"
+                                        th:selected="${opcionCategoria.nombre == categoria}">
+                                    Categoría
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2">
+                            <button type="submit"
+                                    class="btn btn-primary w-100">
+                                Buscar
+                            </button>
+                        </div>
+
                     </div>
+                </form>
+            </section>
 
-                    <!-- Búsqueda y filtros -->
-                    <section class="panel mb-4"
-                             aria-label="Filtros de plantillas">
+            <div class="row g-4">
 
-                        <form method="get" th:action="@{/plantillas}">
-                            <div class="row g-3 align-items-end">
+                <!-- Lista de plantillas -->
+                <section class="col-xl-8">
+                    <div class="panel">
 
-                                <div class="col-lg-4">
-                                    <label for="nombre" class="form-label">
-                                        Buscar plantilla
-                                    </label>
+                        <div class="d-flex flex-wrap justify-content-between
+                             align-items-center gap-2 mb-4">
 
-                                    <input type="search"
-                                           id="nombre"
-                                           name="nombre"
-                                           class="form-control"
-                                           placeholder="Buscar por nombre..."
-                                           th:value="${nombre}">
-                                </div>
+                            <h2 class="h5 mb-0">
+                                Plantillas registradas
+                            </h2>
 
-                                <div class="col-lg-3">
-                                    <label for="perfil" class="form-label">
-                                        Perfil
-                                    </label>
+                            <span class="badge text-bg-light"
+                                  th:text="|${#lists.size(plantillas)} disponibles|">
+                                Cantidad
+                            </span>
+                        </div>
 
-                                    <select id="perfil"
-                                            name="perfil"
-                                            class="form-select">
+                        <div class="table-responsive">
+                            <table class="table align-middle">
 
-                                        <option value=""
-                                                th:selected="${perfil == ''}">
-                                            Todos los perfiles
-                                        </option>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Perfiles</th>
+                                        <th scope="col">Tipo asociado</th>
+                                        <th scope="col">Categoría</th>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
+                                </thead>
 
-                                        <option value="ADMIN"
-                                                th:selected="${perfil == 'ADMIN'}">
-                                            ADMIN
-                                        </option>
+                                <tbody>
+                                    <tr th:each="plantilla : ${plantillas}">
 
-                                        <option value="LIDER"
-                                                th:selected="${perfil == 'LIDER'}">
-                                            LIDER
-                                        </option>
+                                        <td th:text="${plantilla.nombre}">
+                                            Nombre
+                                        </td>
 
-                                        <option value="SUPERVISOR"
-                                                th:selected="${perfil == 'SUPERVISOR'}">
-                                            SUPERVISOR
-                                        </option>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-1">
 
-                                        <option value="QC"
-                                                th:selected="${perfil == 'QC'}">
-                                            QC
-                                        </option>
-
-                                        <option value="RELEASE"
-                                                th:selected="${perfil == 'RELEASE'}">
-                                            RELEASE
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="col-lg-3">
-                                    <label for="categoria" class="form-label">
-                                        Categoría
-                                    </label>
-
-                                    <input type="search"
-                                           id="categoria"
-                                           name="categoria"
-                                           class="form-control"
-                                           placeholder="Nombre de categoría"
-                                           th:value="${categoria}">
-                                </div>
-
-                                <div class="col-lg-2">
-                                    <button type="submit"
-                                            class="btn btn-primary w-100">
-                                        Buscar
-                                    </button>
-                                </div>
-
-                            </div>
-                        </form>
-                    </section>
-
-                    <div class="row g-4">
-
-                        <!-- Resultados -->
-                        <section class="col-xl-8">
-                            <div class="panel">
-
-                                <div class="d-flex flex-wrap justify-content-between
-                                     align-items-center gap-2 mb-4">
-
-                                    <h2 class="h5 mb-0">
-                                        Plantillas registradas
-                                    </h2>
-
-                                    <span class="badge text-bg-light"
-                                          th:text="|${#lists.size(plantillas)} disponibles|">
-                                        Cantidad
-                                    </span>
-                                </div>
-
-                                <div class="table-responsive">
-                                    <table class="table align-middle">
-
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Nombre</th>
-                                                <th scope="col">Perfiles</th>
-                                                <th scope="col">Tipo asociado</th>
-                                                <th scope="col">Categoría</th>
-                                                <th scope="col">Acciones</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-                                            <tr th:each="plantilla : ${plantillas}">
-
-                                                <td th:text="${plantilla.nombre}">
-                                                    Nombre
-                                                </td>
-
-                                                <td>
-                                                    <div class="d-flex flex-wrap gap-1">
-                                                        <span class="badge text-bg-light"
-                                                              th:each="rol : ${plantilla.roles}"
-                                                              th:text="${rol.nombre}">
-                                                            Perfil
-                                                        </span>
-
-                                                        <span class="text-secondary"
-                                                              th:if="${#sets.isEmpty(plantilla.roles)}">
-                                                            Sin perfiles
-                                                        </span>
-                                                    </div>
-                                                </td>
-
-                                                <td th:text="${plantilla.tipoAsociado}">
-                                                    Tipo asociado
-                                                </td>
-
-                                                <td th:text="${plantilla.categoria != null
-                                                    ? plantilla.categoria.nombre
-                                                    : 'Sin categoría'}">
-                                                    Categoría
-                                                </td>
-
-                                                <td>
-                                                    <a class="btn btn-outline-primary btn-sm"
-                                                       th:href="@{/plantillas(
-                                                       id=${plantilla.idPlantilla},
-                                                       nombre=${nombre},
-                                                       perfil=${perfil},
-                                                       categoria=${categoria}
-                                                       )}">
-                                                        Ver detalle
-                                                    </a>
-                                                </td>
-                                            </tr>
-
-                                            <tr th:if="${#lists.isEmpty(plantillas)}">
-                                                <td colspan="5"
-                                                    class="text-center text-secondary py-4">
-                                                    No se encontraron plantillas
-                                                    con esos filtros.
-                                                </td>
-                                            </tr>
-                                        </tbody>
-
-                                    </table>
-                                </div>
-                            </div>
-                        </section>
-
-                        <!-- Detalle -->
-                        <section class="col-xl-4">
-                            <div class="panel">
-
-                                <div th:if="${seleccionada == null}">
-                                    <h2 class="h5 mb-3">Vista de la plantilla</h2>
-
-                                    <p class="text-secondary mb-0">
-                                        Selecciona Ver detalle en una plantilla.
-                                    </p>
-                                </div>
-
-                                <div th:if="${seleccionada != null}">
-                                    <h2 class="h5 mb-3"
-                                        th:text="${seleccionada.nombre}">
-                                        Nombre de plantilla
-                                    </h2>
-
-                                    <div class="d-flex flex-wrap gap-1 mb-3">
-                                        <span class="badge text-bg-light"
-                                              th:each="rol : ${seleccionada.roles}"
-                                              th:text="${rol.nombre}">
-                                            Perfil
-                                        </span>
-                                    </div>
-
-                                    <p class="text-secondary"
-                                       th:text="${seleccionada.categoria != null
-                                       ? seleccionada.categoria.nombre
-                                       : 'Sin categoría'}">
-                                        Categoría
-                                    </p>
-
-                                    <p th:text="${seleccionada.descripcion}">
-                                        Descripción
-                                    </p>
-
-                                    <h3 class="h6">Contenido</h3>
-
-                                    <div class="texto-plantilla mb-4"
-                                         th:text="${seleccionada.contenido}"></div>
-
-                                    <h3 class="h6">Variables de la plantilla</h3>
-
-                                    <p class="text-secondary small"
-                                       th:if="${#lists.isEmpty(seleccionada.variables)}">
-                                        Esta plantilla no tiene variables registradas.
-                                    </p>
-
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"
-                                            th:each="relacion : ${seleccionada.variables}">
-
-                                            <div th:if="${relacion.variable != null}">
-                                                <code th:text="|[${relacion.variable.nombre}]|">
-                                                    Variable
-                                                </code>
-
-                                                <span th:text="${relacion.variable.descripcion}">
-                                                    Descripción
+                                                <span class="badge text-bg-light"
+                                                      th:each="rol : ${plantilla.roles}"
+                                                      th:text="${rol.nombre}">
+                                                    Perfil
                                                 </span>
 
-                                                <span class="badge text-bg-primary"
-                                                      th:if="${relacion.obligatoria}">
-                                                    Obligatoria
+                                                <span class="text-secondary"
+                                                      th:if="${#sets.isEmpty(plantilla.roles)}">
+                                                    Sin perfiles
                                                 </span>
                                             </div>
-                                        </li>
-                                    </ul>
+                                        </td>
 
-                                    <p class="small text-secondary mt-3 mb-0"
-                                       th:if="${seleccionada.requiereEvidencia}">
-                                        Esta plantilla requiere evidencia.
-                                    </p>
-                                </div>
+                                        <td th:text="${plantilla.tipoAsociado}">
+                                            Tipo asociado
+                                        </td>
 
-                            </div>
-                        </section>
+                                        <td th:text="${plantilla.categoria != null
+                                            ? plantilla.categoria.nombre
+                                            : 'Sin categoría'}">
+                                            Categoría
+                                        </td>
 
+                                        <td>
+                                            <a class="btn btn-outline-primary btn-sm"
+                                               th:href="@{/plantillas(
+                                               id=${plantilla.idPlantilla},
+                                               nombre=${nombre},
+                                               perfil=${perfil},
+                                               categoria=${categoria}
+                                               )}">
+                                                Ver detalle
+                                            </a>
+                                        </td>
+                                    </tr>
+
+                                    <tr th:if="${#lists.isEmpty(plantillas)}">
+                                        <td colspan="5"
+                                            class="text-center text-secondary py-4">
+                                            No se encontraron plantillas con esos filtros.
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
                     </div>
-                </main>
+                </section>
+
+                <!-- Vista de la plantilla -->
+                <section class="col-xl-4">
+                    <div class="panel">
+
+                        <div th:if="${seleccionada == null}">
+                            <h2 class="h5 mb-3">
+                                Vista de la plantilla
+                            </h2>
+
+                            <p class="text-secondary mb-0">
+                                Selecciona Ver detalle en una plantilla.
+                            </p>
+                        </div>
+
+                        <div th:if="${seleccionada != null}">
+
+                            <p class="small text-secondary">
+                                VISTA DE LA PLANTILLA
+                            </p>
+
+                            <h2 class="h5 fw-bold mb-3"
+                                th:text="${seleccionada.nombre}">
+                                Nombre de plantilla
+                            </h2>
+
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+
+                                <span class="badge text-bg-light"
+                                      th:each="rol : ${seleccionada.roles}"
+                                      th:text="${rol.nombre}">
+                                    Perfil
+                                </span>
+
+                                <span class="badge text-bg-light"
+                                      th:if="${seleccionada.categoria != null}"
+                                      th:text="${seleccionada.categoria.nombre}">
+                                    Categoría
+                                </span>
+                            </div>
+
+                            <p th:text="${seleccionada.descripcion}">
+                                Descripción
+                            </p>
+
+                            <h3 class="h6">
+                                Estructura del texto
+                            </h3>
+
+                            <div class="texto-plantilla mb-4"
+                                 th:text="${seleccionada.contenido}"></div>
+
+                            <h3 class="h6">
+                                Variables de la plantilla
+                            </h3>
+
+                            <p class="text-secondary small"
+                               th:if="${#lists.isEmpty(seleccionada.variables)}">
+                                Esta plantilla no tiene variables registradas.
+                            </p>
+
+                            <ul class="list-group list-group-flush">
+
+                                <li class="list-group-item px-0"
+                                    th:each="relacion : ${seleccionada.variables}">
+
+                                    <div th:if="${relacion.variable != null}">
+
+                                        <code th:text="|[${relacion.variable.nombre}]|">
+                                            Variable
+                                        </code>
+
+                                        <span th:text="${relacion.variable.descripcion}">
+                                            Descripción
+                                        </span>
+
+                                        <span class="badge text-bg-primary"
+                                              th:if="${relacion.obligatoria}">
+                                            Obligatoria
+                                        </span>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <p class="small text-secondary mt-3 mb-0"
+                               th:if="${seleccionada.requiereEvidencia}">
+                                Esta plantilla requiere evidencia.
+                            </p>
+
+                            <!-- Envía la plantilla seleccionada al generador -->
+                            <div class="d-flex justify-content-end mt-4">
+                                <a class="btn btn-primary"
+                                   th:href="@{/Generador_Notas/generador(
+                                   plantillaId=${seleccionada.idPlantilla}
+                                   )}">
+                                    Usar en generador
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
             </div>
-        </div>
+        </main>
     </body>
 </html>

@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="es"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+      xmlns:th="http://www.thymeleaf.org">
 
-    <!-- Configuración y estilos compartidos -->
     <head th:fragment="head">
         <title>SmartNotes</title>
 
         <meta charset="UTF-8">
-        <meta name="viewport"
-              content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet"
               th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
@@ -26,133 +23,331 @@
 
     <body>
 
-        <!-- Menú compartido -->
-        <header th:fragment="header" class="header">
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-                <div class="container">
+        <aside th:fragment="header"
+               class="sn-sidebar d-print-none"
+               aria-label="Navegación principal">
 
-                    <a th:href="@{/}" class="navbar-brand">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                        <span th:text="#{aplicacion.titulo}">
-                            SmartNotes
-                        </span>
+            <style>
+                body:has(.sn-sidebar) {
+                    padding-left: 260px;
+                }
+
+                .sn-sidebar,
+                .sn-sidebar * {
+                    box-sizing: border-box;
+                }
+
+                .sn-sidebar {
+                    position: fixed;
+                    inset: 0 auto 0 0;
+                    width: 260px;
+                    height: 100dvh;
+                    z-index: 1000;
+                    background: white;
+                    color: #122438;
+                    border-right: 1px solid #e6e9f0;
+                    display: flex;
+                    flex-direction: column;
+                    padding: 30px 20px 18px;
+                    font-family: Arial, sans-serif;
+                }
+
+                .sn-brand {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    color: #122438;
+                    text-decoration: none;
+                    padding: 0 8px;
+                    margin-bottom: 46px;
+                }
+
+                .sn-brand:hover {
+                    color: #004bd6;
+                }
+
+                .sn-logo {
+                    display: grid;
+                    place-items: center;
+                    width: 42px;
+                    height: 42px;
+                    flex-shrink: 0;
+                    border-radius: 7px;
+                    background: #2563eb;
+                    color: white;
+                }
+
+                .sn-brand strong {
+                    display: block;
+                    font-size: 21px;
+                    line-height: 1.2;
+                }
+
+                .sn-brand small {
+                    color: #606779;
+                    font-size: 12px;
+                    letter-spacing: .5px;
+                }
+
+                .sn-nav-scroll {
+                    flex: 1;
+                    min-height: 0;
+                    overflow-y: auto;
+                }
+
+                .sn-caption {
+                    color: #777d8d;
+                    font-size: 11px;
+                    font-weight: 600;
+                    letter-spacing: 1px;
+                    margin: 0 12px 12px;
+                }
+
+                .sn-nav {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                }
+
+                .sn-link {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 13px 12px;
+                    border-radius: 5px;
+                    color: #51596a;
+                    text-decoration: none;
+                    font-size: 15px;
+                    line-height: 1.4;
+                }
+
+                .sn-link:hover {
+                    background: #f1f5ff;
+                    color: #004bd6;
+                }
+
+                .sn-link[aria-current="page"] {
+                    color: #004bd6;
+                    background: #e5edff;
+                    font-weight: 600;
+                }
+
+                .sn-link svg {
+                    width: 18px;
+                    height: 18px;
+                    flex-shrink: 0;
+                }
+
+                .sn-logout {
+                    border-top: 1px solid #edf0f5;
+                    padding-top: 12px;
+                    margin: 18px 0 0;
+                }
+
+                .sn-logout button {
+                    width: 100%;
+                    border: 0;
+                    background: transparent;
+                    color: #df5166;
+                    text-align: left;
+                    cursor: pointer;
+                    font-family: inherit;
+                    font-size: 14px;
+                }
+
+                .sn-logout button:hover {
+                    color: #b82b41;
+                    background: #fff1f3;
+                }
+
+                .sn-link:focus-visible,
+                .sn-brand:focus-visible {
+                    outline: 3px solid #8eb5ff;
+                    outline-offset: 2px;
+                }
+
+                @media (max-width: 767px) {
+                    body:has(.sn-sidebar) {
+                        padding-left: 0;
+                    }
+
+                    .sn-sidebar {
+                        position: relative;
+                        width: 100%;
+                        height: auto;
+                        padding: 18px;
+                        border-right: 0;
+                        border-bottom: 1px solid #e6e9f0;
+                    }
+
+                    .sn-brand {
+                        margin-bottom: 20px;
+                    }
+
+                    .sn-nav-scroll {
+                        overflow: visible;
+                    }
+
+                    .sn-logout {
+                        margin-top: 14px;
+                    }
+                }
+
+                @media print {
+                    body:has(.sn-sidebar) {
+                        padding-left: 0;
+                    }
+
+                    .sn-sidebar {
+                        display: none !important;
+                    }
+                }
+            </style>
+
+            <!-- Logo: volver a Inicio -->
+            <a class="sn-brand"
+               th:href="@{/}"
+               aria-label="SmartNotes: volver a Inicio">
+
+                <span class="sn-logo" aria-hidden="true">
+                    <svg width="25"
+                         height="25"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.7"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+                    <path d="M12 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-7M16 3l5 5M9 15l1-5L18 2l4 4-8 8-5 1Z"/>
+                    </svg>
+                </span>
+
+                <span>
+                    <strong>SmartNotes</strong>
+                    <small>Notas de Planta</small>
+                </span>
+            </a>
+
+            <!-- Menú izquierdo -->
+            <div class="sn-nav-scroll">
+                <p class="sn-caption">OPERACIÓN</p>
+
+                <nav class="sn-nav" aria-label="Módulos de SmartNotes">
+
+                    <a class="sn-link"
+                       data-sn-path="/Generador_Notas"
+                       th:href="@{/Generador_Notas/generador}">
+
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
+                        <path d="M4 5h12M4 9h9M4 13h6M13 20l1-4 6-6 3 3-6 6-4 1Z"/>
+                        </svg>
+
+                        <span>Generador de Notas</span>
                     </a>
 
-                    <button class="navbar-toggler"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#navbarCollapse"
-                            aria-controls="navbarCollapse"
-                            aria-expanded="false"
-                            aria-label="Abrir menú">
+                    <a class="sn-link"
+                       data-sn-path="/plantillas"
+                       th:href="@{/plantillas}">
 
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
+                        <path d="M3 4h18v5H3zM5 9v11h14V9M9 13h6"/>
+                        </svg>
 
-                    <div class="collapse navbar-collapse"
-                         id="navbarCollapse">
+                        <span>Catálogo de Plantillas</span>
+                    </a>
 
-                        <!-- Navegación -->
-                        <ul class="navbar-nav me-auto">
+                    <a class="sn-link"
+                       data-sn-path="/bitacora"
+                       th:href="@{/bitacora}">
 
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   th:href="@{/}">
-                                    Inicio
-                                </a>
-                            </li>
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="1.8"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
+                        <path d="M3 11a9 9 0 1 1 2 7M3 4v7h7M12 7v5l3 2"/>
+                        </svg>
 
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   th:href="@{/plantillas}">
-                                    Catálogo de plantillas
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   th:href="@{/bitacora}"
-                                   th:text="#{bitacora.menu}">
-                                    Bitácora de notas
-                                </a>
-                            </li>
+                        <span>Bitácora de Notas</span>
+                    </a>
 
-                            <li class="nav-item"
-                                sec:authorize="hasRole('ADMIN')">
-                                <a class="nav-link"
-                                   th:href="@{/plantillas/administracion}">
-                                    Administrar plantillas
-                                </a>
-                            </li>
+                </nav>
+            </div>
 
-                        </ul>
+            <!-- Cerrar sesión al fondo -->
+            <form class="sn-logout"
+                  th:action="@{/logout}"
+                  method="post">
 
-                        <!-- Idioma, usuario y cierre de sesión -->
-                        <ul class="navbar-nav align-items-lg-center">
+                <button class="sn-link" type="submit">
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle"
-                                   id="menuIdioma"
-                                   href="#"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false"
-                                   th:text="#{plantilla.idioma}">
-                                    Idioma
-                                </a>
+                    <svg viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.8"
+                         stroke-linecap="round"
+                         stroke-linejoin="round"
+                         aria-hidden="true">
+                    <path d="M9 4H4v16h5M9 12h12M17 8l4 4-4 4"/>
+                    </svg>
 
-                                <ul class="dropdown-menu"
-                                    aria-labelledby="menuIdioma">
+                    <span>Cerrar Sesión</span>
+                </button>
+            </form>
 
-                                    <li>
-                                        <a class="dropdown-item"
-                                           th:href="@{/(lang=es)}">
-                                            Español
-                                        </a>
-                                    </li>
+            <!-- Resaltar la sección actual -->
+            <script>
+                (function () {
+                    const menu = document.currentScript.closest(".sn-sidebar");
 
-                                    <li>
-                                        <a class="dropdown-item"
-                                           th:href="@{/(lang=en)}">
-                                            English
-                                        </a>
-                                    </li>
+                    const ruta =
+                            window.location.pathname.replace(/\/$/, "") || "/";
 
-                                </ul>
-                            </li>
+                    const enlaces = Array.from(
+                            menu.querySelectorAll("[data-sn-path]")
+                            );
 
-                            <li class="nav-item px-lg-2 text-white">
-                                <i class="fa-solid fa-user"></i>
+                    const coincidencias = enlaces.filter(function (enlace) {
+                        const destino = new URL(
+                                enlace.href,
+                                window.location.href
+                                ).pathname.replace(/\/$/, "");
 
-                                <span sec:authentication="name">
-                                    Usuario
-                                </span>
-                            </li>
+                        if (enlace.dataset.snPath === "/Generador_Notas") {
+                            const base = destino.replace(/\/generador$/, "");
 
-                            <li class="nav-item mt-2 mt-lg-0">
-                                <form th:action="@{/logout}"
-                                      method="post">
+                            return ruta === base || ruta.startsWith(base + "/");
+                        }
 
-                                    <button type="submit"
-                                            class="btn btn-outline-light btn-sm">
+                        return ruta === destino || ruta.startsWith(destino + "/");
+                    });
 
-                                        <i class="fa-solid fa-right-from-bracket"></i>
+                    coincidencias.sort(function (a, b) {
+                        return b.href.length - a.href.length;
+                    });
 
-                                        <span th:text="#{accion.cerrar_sesion}">
-                                            Cerrar sesión
-                                        </span>
-                                    </button>
+                    if (coincidencias[0]) {
+                        coincidencias[0].setAttribute("aria-current", "page");
+                    }
+                })();
+            </script>
 
-                                </form>
-                            </li>
+        </aside>
 
-                        </ul>
-
-                    </div>
-                </div>
-            </nav>
-        </header>
-
-        <!-- Pie de página compartido -->
         <footer th:fragment="footer"
                 class="p-2 mt-5 bg-light text-muted d-print-none">
 
@@ -162,7 +357,6 @@
                 </span>
                 &copy;
             </p>
-
         </footer>
 
     </body>
